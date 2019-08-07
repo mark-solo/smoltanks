@@ -12,13 +12,19 @@ function love.load()
   recursiveEnumerate('objects', object_files)
   requireFiles(object_files)
 
+	input = Input()
+	input:bind('w', 'forward')
+	input:bind('s', 'back')
+	input:bind('a', 'left')
+	input:bind('d', 'right')
+
 	world = wf.newWorld(0, 0, true)
 	scene = GameScene()
 end
 
 function love.update(dt)
 	scene:input()
-	scene:update()
+	scene:update(dt)
 
 	fixedUpdateTimer = fixedUpdateTimer + dt
 	if fixedUpdateTimer > fixedUpdateRate then
