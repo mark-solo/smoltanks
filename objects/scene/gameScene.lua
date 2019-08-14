@@ -3,7 +3,14 @@ GameScene = Scene:extend()
 local player
 
 function GameScene:new()
-  player = Player()
+  box = world:newRectangleCollider(love.graphics.getWidth()/2-50, love.graphics.getHeight()/2-20, 100, 40)
+  box:applyAngularImpulse(5000)
+  box:setMass(100)
+  box:setLinearDamping(5)
+  box:setAngularDamping(5)
+  --box:setType('static')
+
+  player = Player(100, 100)
 end
 
 function GameScene:input()
@@ -24,5 +31,7 @@ function GameScene:update(dt)
 end
 
 function GameScene:render()
+  world:draw(128)
+
   player:draw()
 end

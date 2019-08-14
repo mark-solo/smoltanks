@@ -2,11 +2,11 @@ Object = require "lib.classic"
 Input = require "lib.input"
 wf = require "lib.windfield"
 
-local fixedUpdateRate = 0.2
+local fixedUpdateRate = 0.02
 local fixedUpdateTimer = 0
 
 function love.load()
-	love.window.setMode(320, 240)
+	love.window.setMode(640, 480)
 
 	local object_files = {}
   recursiveEnumerate('objects', object_files)
@@ -25,16 +25,23 @@ end
 function love.update(dt)
 	scene:input()
 	scene:update(dt)
+	world:update(dt)
 
 	fixedUpdateTimer = fixedUpdateTimer + dt
 	if fixedUpdateTimer > fixedUpdateRate then
 		scene:fixedUpdate(fixedUpdateTimer)
+		--world:update(fixedUpdateTimer)
 		fixedUpdateTimer = 0
 	end
 end
 
 function love.draw()
 	scene:render()
+end
+
+function love.event.quit()
+	print("logging")
+	world.destroy()
 end
 
 ---------
