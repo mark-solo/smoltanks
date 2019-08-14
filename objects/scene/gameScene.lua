@@ -3,12 +3,11 @@ GameScene = Scene:extend()
 local player
 
 function GameScene:new()
-  box = world:newRectangleCollider(love.graphics.getWidth()/2-50, love.graphics.getHeight()/2-20, 100, 40)
+  box = world:newRectangleCollider(love.graphics.getWidth()/2-50, love.graphics.getHeight()/2-30, 100, 60)
   box:applyAngularImpulse(5000)
   box:setMass(100)
-  box:setLinearDamping(5)
-  box:setAngularDamping(5)
-  --box:setType('static')
+  --box:setLinearDamping(5)
+  --box:setAngularDamping(5)
 
   player = Player(100, 100)
 end
