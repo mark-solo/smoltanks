@@ -22,15 +22,21 @@ function love.load()
 
 	r = ResourceManager()
 
-	input = Input()
+	input = Input() -- TODO: move controls to options
 	input:bind('w', 'forward')
 	input:bind('s', 'back')
 	input:bind('a', 'left')
 	input:bind('d', 'right')
 	input:bind('space', 'space')
+	input:bind('up', 'dup')
+	input:bind('down', 'ddown')
+	input:bind('left', 'dleft')
+	input:bind('right', 'dright')
 
 	world = wf.newWorld(0, 0, true)
 	scene = GameScene()
+
+	camera = Camera()
 end
 
 function love.update(dt)
@@ -47,10 +53,12 @@ function love.update(dt)
 end
 
 function love.draw()
+	camera:apply()
 	scene:render()
 	love.graphics.draw(sprites['red'], love.graphics.getWidth()-64, 0)
 
 	if (DEBUG) then
+		world:draw(128)
 		draw_log()
 	end
 end

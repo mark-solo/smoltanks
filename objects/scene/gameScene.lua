@@ -23,6 +23,12 @@ function GameScene:input()
 
   player:move(ds)
   player:turn(da)
+
+  if input:down('dup') then camera.y = camera.y-1 end
+	if input:down('ddown') then camera.y = camera.y+1 end
+	if input:down('dleft') then camera.x = camera.x-1 end
+	if input:down('dright') then camera.x = camera.x+1 end
+
 end
 
 function GameScene:update(dt)
@@ -30,7 +36,5 @@ function GameScene:update(dt)
 end
 
 function GameScene:render()
-  world:draw(128)
-
   player:draw()
 end
