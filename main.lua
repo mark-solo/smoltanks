@@ -2,6 +2,7 @@
 Object = require "lib.classic"
 Input = require "lib.input"
 wf = require "lib.windfield"
+inspect = require "lib.inspect"
 
 -- constants
 DEBUG = true
@@ -47,6 +48,7 @@ end
 
 function love.draw()
 	scene:render()
+	love.graphics.draw(sprites['red'], love.graphics.getWidth()-64, 0)
 
 	if (DEBUG) then
 		draw_log()
