@@ -6,6 +6,7 @@ inspect = require "lib.inspect"
 
 -- constants
 DEBUG = true
+TILE_SIZE = 150
 
 -- core game local variable
 local fixedUpdateRate = 0.02
@@ -58,7 +59,7 @@ function love.draw()
 	love.graphics.draw(sprites['red'], love.graphics.getWidth()-64, 0)
 
 	if (DEBUG) then
-		world:draw(128)
+		world:draw(0.5)
 		draw_log()
 	end
 end

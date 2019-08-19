@@ -68,7 +68,7 @@ function Player:draw()
   love.graphics.translate(self.x, self.y)
 
   local mouseX, mouseY = love.mouse.getPosition()
-  local gun_angle = math.atan2(mouseY-self.y, mouseX-self.x)
+  local gun_angle = math.atan2(mouseY-self.y+camera.y-love.graphics.getHeight()/2, mouseX-self.x+camera.x-love.graphics.getWidth()/2)
   love.graphics.rotate(gun_angle)
 
   love.graphics.setColor(1, 1, 1)

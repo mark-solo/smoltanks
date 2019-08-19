@@ -3,11 +3,13 @@ GameScene = Scene:extend()
 local player
 
 function GameScene:new()
+  level = Level()
+
   box = world:newRectangleCollider(love.graphics.getWidth()/2-50, love.graphics.getHeight()/2-30, 100, 60)
   box:applyAngularImpulse(5000)
   box:setMass(100)
-  --box:setLinearDamping(5)
-  --box:setAngularDamping(5)
+  box:setLinearDamping(0.5)
+  box:setAngularDamping(0.5)
 
   player = Player(100, 100)
 end
@@ -36,5 +38,6 @@ function GameScene:update(dt)
 end
 
 function GameScene:render()
+  level:draw()
   player:draw()
 end

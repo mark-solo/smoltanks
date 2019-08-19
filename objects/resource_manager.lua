@@ -2,8 +2,11 @@ ResourceManager = Object:extend()
 
 function ResourceManager:new()
   log("ResourceManager: init")
+
   sprites = {}
   self:loadSprites()
+
+  -- level state = {}
 end
 
 local function stripFileToName(string)
