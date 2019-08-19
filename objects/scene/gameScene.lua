@@ -24,15 +24,15 @@ function GameScene:input()
   player:move(ds)
   player:turn(da)
 
-  if input:down('dup') then camera.y = camera.y-1 end
-	if input:down('ddown') then camera.y = camera.y+1 end
-	if input:down('dleft') then camera.x = camera.x-1 end
-	if input:down('dright') then camera.x = camera.x+1 end
+  if input:pressed('dup') then camera.scale = camera.scale*0.5 end
+	if input:pressed('ddown') then camera.scale = camera.scale*2 end
 
 end
 
 function GameScene:update(dt)
   player:update(dt)
+
+  camera:setPos(player.x, player.y)
 end
 
 function GameScene:render()
