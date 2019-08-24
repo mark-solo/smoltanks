@@ -1,9 +1,10 @@
 GameScene = Scene:extend()
 
 local player
+local box
 
-function GameScene:new()
-  level = Level()
+function GameScene:new(levelName)
+  level = levels[levelName]
 
   box = world:newRectangleCollider(love.graphics.getWidth()/2-50, love.graphics.getHeight()/2-30, 100, 60)
   box:applyAngularImpulse(5000)

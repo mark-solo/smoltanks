@@ -6,6 +6,9 @@ function ResourceManager:new()
   sprites = {}
   self:loadSprites()
 
+  levels = {}
+  self:loadLevels()
+
   -- level state = {}
 end
 
@@ -28,4 +31,21 @@ function ResourceManager:loadSprites()
     sprites[name] = love.graphics.newImage(file)
     log('loadSprite: '..name..'='..file)
   end
+end
+
+function ResourceManager:loadLevels()
+  local sizeX = 20
+  local sizeY = 10
+  local map = {}
+
+  for i=1,sizeY do
+    local row = {}
+    for j=1,sizeX do
+      local num = math.random()>0.9 and 1 or 0
+      table.insert(row, num)
+    end
+    table.insert(map, row)
+  end
+
+  levels['test'] = Level(map, sizeX, sizeY)
 end

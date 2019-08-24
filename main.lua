@@ -21,6 +21,7 @@ function love.load()
   recursiveEnumerate('objects', object_files)
   requireFiles(object_files)
 
+  world = wf.newWorld(0, 0, true)
 	r = ResourceManager()
 
 	input = Input() -- TODO: move controls to options
@@ -34,10 +35,11 @@ function love.load()
 	input:bind('left', 'dleft')
 	input:bind('right', 'dright')
 
-	world = wf.newWorld(0, 0, true)
-	scene = GameScene()
+
+	scene = GameScene('test')
 
 	camera = Camera()
+	camera.scale = 0.25
 end
 
 function love.update(dt)
@@ -59,7 +61,7 @@ function love.draw()
 	love.graphics.draw(sprites['red'], love.graphics.getWidth()-64, 0)
 
 	if (DEBUG) then
-		world:draw(0.5)
+		world:draw(0.2)
 		draw_log()
 	end
 end
