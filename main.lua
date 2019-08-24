@@ -21,7 +21,7 @@ function love.load()
   recursiveEnumerate('objects', object_files)
   requireFiles(object_files)
 
-  world = wf.newWorld(0, 0, true)
+  --world = wf.newWorld(0, 0, true)
 	r = ResourceManager()
 
 	input = Input() -- TODO: move controls to options
@@ -45,7 +45,6 @@ end
 function love.update(dt)
 	scene:input()
 	scene:update(dt)
-	world:update(dt)
 
 	fixedUpdateTimer = fixedUpdateTimer + dt
 	if fixedUpdateTimer > fixedUpdateRate then
@@ -59,16 +58,11 @@ function love.draw()
 	camera:apply()
 	scene:render()
 	love.graphics.draw(sprites['red'], love.graphics.getWidth()-64, 0)
-
-	if (DEBUG) then
-		world:draw(0.2)
-		draw_log()
-	end
 end
 
 function love.event.quit()
 	print("logging")
-	world.destroy()
+	for _, level in ipairs(levels) do level.world.destroy() end
 end
 
 ---------

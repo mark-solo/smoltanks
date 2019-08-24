@@ -1,6 +1,6 @@
 Player = Object:extend()
 
-function Player:new(x, y, w, h)
+function Player:new(level, x, y, w, h)
   self.x = x or love.graphics.getWidth()/2
   self.y = y or love.graphics.getHeight()/2
   self.w = w or 90
@@ -12,7 +12,7 @@ function Player:new(x, y, w, h)
   self.ds = 0
   self.moveSpeed = 1000000
 
-  self.collider = world:newRectangleCollider(self.x, self.y, self.w, self.h)
+  self.collider = level.world:newRectangleCollider(self.x, self.y, self.w, self.h)
   self.collider:setObject(self)
   self.collider:setLinearDamping(5)
   self.collider:setAngularDamping(5)
