@@ -6,7 +6,7 @@ inspect = require "lib.inspect"
 
 -- constants
 DEBUG = true
-TILE_SIZE = 150
+TILE_SIZE = 64
 
 -- core game local variable
 local fixedUpdateRate = 0.02
@@ -15,7 +15,8 @@ local fixedUpdateTimer = 0
 local log_text = 'init'
 
 function love.load()
-	love.window.setMode(640, 480)
+	--love.window.setMode(640, 480)
+	love.window.setMode(TILE_SIZE*8, TILE_SIZE*8)
 
 	local object_files = {}
   recursiveEnumerate('objects', object_files)
@@ -39,7 +40,7 @@ function love.load()
 	scene = GameScene('test')
 
 	camera = Camera()
-	camera.scale = 0.25
+	--camera.scale = 0.25
 end
 
 function love.update(dt)

@@ -19,6 +19,8 @@ function GameScene:input()
   if input:pressed('dup') then camera.scale = camera.scale*0.5 end
 	if input:pressed('ddown') then camera.scale = camera.scale*2 end
 
+  if input:pressed('space') then level.bullet.launch(10000) end
+
 end
 
 function GameScene:update(dt)

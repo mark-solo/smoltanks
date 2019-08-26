@@ -3,14 +3,14 @@ Player = Object:extend()
 function Player:new(level, x, y, w, h)
   self.x = x or love.graphics.getWidth()/2
   self.y = y or love.graphics.getHeight()/2
-  self.w = w or 90
-  self.h = h or 50
+  self.w = w or TILE_SIZE*0.7
+  self.h = h or TILE_SIZE*0.4
   self.angle = 0
 
   self.da = 0
-  self.turnSpeed = 10000000
+  self.turnSpeed = 10000*TILE_SIZE
   self.ds = 0
-  self.moveSpeed = 1000000
+  self.moveSpeed = 2000*TILE_SIZE
 
   self.collider = level.world:newRectangleCollider(self.x, self.y, self.w, self.h)
   self.collider:setObject(self)
@@ -72,11 +72,11 @@ function Player:draw()
   love.graphics.rotate(gun_angle)
 
   love.graphics.setColor(1, 1, 1)
-  love.graphics.circle('line', 0, 0, 25, 5)
+  love.graphics.circle('line', 0, 0, self.h/2, 5)
 
-  love.graphics.line(0, 0, 75, 0)
-  love.graphics.line(0, 0, 25*math.cos(-math.pi/2.5), 25*math.sin(-math.pi/2.5))
-  love.graphics.line(0, 0, 25*math.cos( math.pi/2.5), 25*math.sin( math.pi/2.5))
+  love.graphics.line(0, 0, self.h*1.2, 0)
+  love.graphics.line(0, 0, self.h/2*math.cos(-math.pi/2.5), self.h/2*math.sin(-math.pi/2.5))
+  love.graphics.line(0, 0, self.h/2*math.cos( math.pi/2.5), self.h/2*math.sin( math.pi/2.5))
 
   love.graphics.pop()
 end
