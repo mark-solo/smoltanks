@@ -27,9 +27,17 @@ function Bullet:launch(impulse)
 end
 
 function Bullet:update(dt)
-
+  self.angle = self.collider:getAngle()
+  self.x, self.y = self.collider:getPosition()
 end
 
 function Bullet:draw()
+  love.graphics.push()
+  love.graphics.translate(self.x, self.y)
+  love.graphics.rotate(self.angle)
 
+  love.graphics.setColor(1, 0, 0)
+  love.graphics.rectangle('fill', -self.w/2, -self.h/2, self.w, self.h)
+
+  love.graphics.pop()
 end

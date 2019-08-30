@@ -13,20 +13,20 @@ function GameScene:input()
   if input:down('right') then da = da + 1 end
   if input:down('left') then da = da - 1 end
 
-  level.player:move(ds)
-  level.player:turn(da)
+  level:getEntity('player'):move(ds)
+  level:getEntity('player'):turn(da)
 
   if input:pressed('dup') then camera.scale = camera.scale*0.5 end
 	if input:pressed('ddown') then camera.scale = camera.scale*2 end
 
-  if input:pressed('space') then level.bullet.launch(10000) end
+  if input:pressed('space') then level:getEntity('bullet'):launch(10000) end
 
 end
 
 function GameScene:update(dt)
   level:update(dt)
 
-  camera:setPos(level.player.x, level.player.y)
+  camera:setPos(level:getEntity('player').x, level:getEntity('player').y)
 end
 
 function GameScene:render()

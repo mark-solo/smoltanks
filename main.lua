@@ -93,5 +93,6 @@ function log(text)
 end
 
 function draw_log()
+	love.graphics.setColor(1, 1, 1)
 	love.graphics.print(log_text, 0, 0)
 end
