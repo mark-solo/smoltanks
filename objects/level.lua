@@ -3,12 +3,21 @@ Level = Object:extend() -- store entities
 function Level:new(map, sizeX, sizeY)
   self.world = wf.newWorld(0, 0, true)
   self.world:addCollisionClass('Player')
-  self.world:addCollisionClass('Bullet')
+  self.world:addCollisionClass('Bullet', {ignores = {'Bullet'}})
+  self.world:addCollisionClass('Wall')
 
   self.map = Map(self, map, sizeX, sizeY)
 
   self.entities = {}
-  self.entities['bullet'] = Bullet(self, TILE_SIZE*2, TILE_SIZE, 0)
+
+  self.bullets = {}
+  for i=1,20 do
+    local bullet = Bullet(self)
+    table.insert(self.bullets, bullet)
+    table.insert(self.entities, bullet)
+  end
+  --self.entities['bullet'] = Bullet(self, TILE_SIZE*2, TILE_SIZE, math.pi/2)
+
   self.entities['player'] = Player(self, TILE_SIZE, TILE_SIZE)
 
   log('entities: '..inspect(self.entities, {depth=1}))
@@ -35,11 +44,9 @@ function Level:draw()
   end
   --self.bullet:draw()
   --self.player:draw()
-
   if (DEBUG) then
-		self.world:draw(0.2)
-		draw_log()
-	end
+    self.world:draw(0.2)
+  end
 end
 
 -- pool functions
@@ -48,5 +55,7 @@ function Level:initBullets(amount)
 end
 
 function Level:getBullet()
-  --
+  local bullet = table.remove(self.bullets, 1)
+  table.insert(self.bullets, bullet)
+  return bullet
 end

@@ -33,6 +33,7 @@ function love.load()
 	input:bind('a', 'left')
 	input:bind('d', 'right')
 	input:bind('space', 'space')
+	input:bind('mouse1', 'click')
 	input:bind('up', 'dup')
 	input:bind('down', 'ddown')
 	input:bind('left', 'dleft')
@@ -62,11 +63,14 @@ end
 function love.draw()
 	camera:apply()
 	scene:render()
-	love.graphics.draw(sprites['red'], love.graphics.getWidth()-64, 0)
+	love.graphics.draw(sprites['red'], TILE_SIZE*2, TILE_SIZE*2)
+
+	if (DEBUG) then
+		draw_log()
+	end
 end
 
 function love.event.quit()
-	print("logging")
 	for _, level in ipairs(levels) do level.world.destroy() end
 end
 
@@ -98,5 +102,5 @@ end
 
 function draw_log()
 	love.graphics.setColor(1, 1, 1)
-	love.graphics.print(log_text, 0, 0)
+	love.graphics.print(log_text, camera.x-love.graphics.getWidth()/2, camera.y-love.graphics.getHeight()/2)
 end

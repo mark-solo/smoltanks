@@ -15,7 +15,7 @@ function Map:new(level, map, sizeX, sizeY)
   table.insert(walls, self.level.world:newRectangleCollider(-TILE_SIZE, 0, TILE_SIZE, self.size.y*TILE_SIZE))
   table.insert(walls, self.level.world:newRectangleCollider(self.size.x*TILE_SIZE, 0, TILE_SIZE, self.size.y*TILE_SIZE))
   --box = world:newRectangleCollider(love.graphics.getWidth()/2-50, love.graphics.getHeight()/2-30, 100, 60)
-  for _, wall in ipairs(walls) do wall:setType('static') end
+  for _, wall in ipairs(walls) do wall:setType('static') wall:setCollisionClass('Wall') end
 
   -- blocks
   for i=1,self.size.x do
@@ -24,6 +24,7 @@ function Map:new(level, map, sizeX, sizeY)
       if (num==1) then
         local block = self.level.world:newRectangleCollider((i-1)*TILE_SIZE, (j-1)*TILE_SIZE, TILE_SIZE, TILE_SIZE)
         block:setType('static')
+        block:setCollisionClass('Wall')
       end
     end
   end

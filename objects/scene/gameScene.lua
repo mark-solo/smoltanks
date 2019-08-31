@@ -19,7 +19,9 @@ function GameScene:input()
   if input:pressed('dup') then camera.scale = camera.scale*0.5 end
 	if input:pressed('ddown') then camera.scale = camera.scale*2 end
 
-  if input:pressed('space') then level:getEntity('bullet'):launch(500) end
+  if love.mouse.isDown(1) then
+    level:getEntity('player'):shoot()
+  end
 
 end
 
