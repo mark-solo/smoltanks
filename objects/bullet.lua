@@ -15,9 +15,11 @@ function Bullet:new(level, x, y, angle, w, h, tag)
   self.moveSpeed = 2000*TILE_SIZE
 
   self.collider = level.world:newRectangleCollider(self.x, self.y, self.w, self.h)
+  self.collider:setCollisionClass('Bullet')
   self.collider:setObject(self)
-  self.collider:setLinearDamping(5)
-  self.collider:setAngularDamping(5)
+  --self.collider:setLinearDamping(5)
+  --self.collider:setAngularDamping(5)
+  self.collider:setType('dynamic')
 end
 
 function Bullet:launch(impulse)
@@ -29,6 +31,12 @@ end
 function Bullet:update(dt)
   self.angle = self.collider:getAngle()
   self.x, self.y = self.collider:getPosition()
+
+  if self.collider:enter('Player') or self.collider:exit('Player')then
+    local collision_data = self.collider:getEnterCollisionData('Player')
+    local player = collision_data.collider:getObject()
+    log('hit '..timer)
+  end
 end
 
 function Bullet:draw()

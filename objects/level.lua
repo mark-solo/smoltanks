@@ -2,6 +2,8 @@ Level = Object:extend() -- store entities
 
 function Level:new(map, sizeX, sizeY)
   self.world = wf.newWorld(0, 0, true)
+  self.world:addCollisionClass('Player')
+  self.world:addCollisionClass('Bullet')
 
   self.map = Map(self, map, sizeX, sizeY)
 
@@ -38,4 +40,13 @@ function Level:draw()
 		self.world:draw(0.2)
 		draw_log()
 	end
+end
+
+-- pool functions
+function Level:initBullets(amount)
+  --
+end
+
+function Level:getBullet()
+  --
 end

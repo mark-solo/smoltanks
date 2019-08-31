@@ -13,6 +13,7 @@ function Player:new(level, x, y, w, h)
   self.moveSpeed = 2000*TILE_SIZE
 
   self.collider = level.world:newRectangleCollider(self.x, self.y, self.w, self.h)
+  self.collider:setCollisionClass('Player')
   self.collider:setObject(self)
   self.collider:setLinearDamping(5)
   self.collider:setAngularDamping(5)

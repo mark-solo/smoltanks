@@ -14,6 +14,8 @@ local fixedUpdateTimer = 0
 
 local log_text = 'init'
 
+timer = 0
+
 function love.load()
 	--love.window.setMode(640, 480)
 	love.window.setMode(TILE_SIZE*8, TILE_SIZE*8)
@@ -53,6 +55,8 @@ function love.update(dt)
 		--world:update(fixedUpdateTimer)
 		fixedUpdateTimer = 0
 	end
+
+	timer = timer + dt
 end
 
 function love.draw()
