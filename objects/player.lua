@@ -12,7 +12,7 @@ function Player:new(level, x, y, w, h)
   self.ds = 0
   self.moveSpeed = 2000*TILE_SIZE
 
-  self.fireRate = 0.2
+  self.fireRate = 0.5
   self.fireTimer = 0
 
   self.collider = level.world:newRectangleCollider(self.x, self.y, self.w, self.h)
@@ -37,8 +37,13 @@ function Player:shoot()
     local mouseX, mouseY = love.mouse.getPosition()
     local gun_angle = math.atan2(mouseY-self.y+camera.y-love.graphics.getHeight()/2, mouseX-self.x+camera.x-love.graphics.getWidth()/2)
 
-   local d = self.w+bullet.w+10
-    bullet:launch(d*math.cos(gun_angle)+self.x, d*math.sin(gun_angle)+self.y, gun_angle)
+    local dx = math.cos(gun_angle)
+    local dy = math.sin(gun_angle)
+    local d = self.w+bullet.w+10
+    bullet:launch(d*dx+self.x, d*dy+self.y, gun_angle)
+
+    local knockback = 500
+    self.collider:applyLinearImpulse(-knockback*dx, -knockback*dy)
 
     self.fireTimer = 0
   end

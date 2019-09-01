@@ -9,14 +9,17 @@ function Bullet:new(level, x, y, angle, w, h, tag)
   self.angle = angle or 0
   self.tag = tag or nil
 
-  self.bumpForce = 20
+  self.bumpForce = 500
 
-  self.collider = level.world:newCircleCollider(self.x, self.y, self.h/2)
+  self.collider = level.world:newRectangleCollider(self.x, self.y, self.w, self.h)
   self.collider:setAngle(self.angle)
   self.collider:setCollisionClass('Bullet')
+  self.collider:setCategory(1, 2)
+  self.collider:setMask(2)
   self.collider:setObject(self)
   --self.collider:setBullet(true)
   self.collider:setActive(false)
+  --self.collider:setSensor(true)
 end
 
 function Bullet:launch(x, y, angle)
@@ -30,12 +33,16 @@ function Bullet:launch(x, y, angle)
   self.collider:setAngle(angle)
 
   self.collider:setActive(true)
-  self.collider:applyLinearImpulse(dx*self.bumpForce, dy*self.bumpForce)
+  --self.collider:applyLinearImpulse(dx*self.bumpForce, dy*self.bumpForce)
 end
 
 function Bullet:update(dt)
-  self.angle = self.collider:getAngle()
+  --self.angle = self.collider:getAngle()
   self.x, self.y = self.collider:getPosition()
+  local dx = math.cos(self.angle)
+  local dy = math.sin(self.angle)
+  --self.collider:applyForce(dx*self.bumpForce, dy*self.bumpForce)
+  self.collider:setLinearVelocity(dx*self.bumpForce, dy*self.bumpForce)
 
   if self.collider:enter('Player') or self.collider:exit('Player') then
     local collision_data = self.collider:getEnterCollisionData('Player')
@@ -47,6 +54,10 @@ function Bullet:update(dt)
   if self.collider:enter('Wall') or self.collider:exit('Wall') then -- did i hit anything?
     self.collider:setActive(false)
   end
+
+  --if #self.collider:getContacts()>0 then
+  --  self.collider:setActive(false)
+  --end
 end
 
 function Bullet:draw()
