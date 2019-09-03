@@ -27,6 +27,14 @@ function Level:getEntity(entityName)
   return self.entities[entityName]
 end
 
+function Level:input()
+  for _, entity in pairs(self.entities) do
+    if entity.input then
+      entity:input()
+    end
+  end
+end
+
 function Level:update(dt)
   for _, entity in pairs(self.entities) do
     entity:update(dt)

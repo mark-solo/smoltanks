@@ -5,24 +5,7 @@ function GameScene:new(levelName)
 end
 
 function GameScene:input()
-  local ds = 0
-  local da = 0
-
-  if input:down('forward') then ds = ds + 1 end
-  if input:down('back') then ds = ds - 1 end
-  if input:down('right') then da = da + 1 end
-  if input:down('left') then da = da - 1 end
-
-  level:getEntity('player'):move(ds)
-  level:getEntity('player'):turn(da)
-
-  if input:pressed('dup') then camera.scale = camera.scale*0.5 end
-	if input:pressed('ddown') then camera.scale = camera.scale*2 end
-
-  if love.mouse.isDown(1) then
-    level:getEntity('player'):shoot()
-  end
-
+  level:input()
 end
 
 function GameScene:update(dt)
