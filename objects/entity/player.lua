@@ -1,11 +1,7 @@
-Player = Object:extend()
+Player = Entity:extend()
 
-function Player:new(level, x, y, w, h)
-  self.x = x or love.graphics.getWidth()/2
-  self.y = y or love.graphics.getHeight()/2
-  self.w = w or TILE_SIZE*0.7
-  self.h = h or TILE_SIZE*0.4
-  self.angle = 0
+function Player:new(level, x, y)
+  Bullet.super.new(self, level, x, y, 0, TILE_SIZE*0.7, TILE_SIZE*0.4)
 
   self.da = 0
   self.turnSpeed = 10000*TILE_SIZE

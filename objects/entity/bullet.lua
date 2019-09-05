@@ -1,12 +1,7 @@
-Bullet = Object:extend()
+Bullet = Entity:extend()
 
-function Bullet:new(level, x, y, angle, w, h, tag)
-  self.level = level
-  self.x = x or 0
-  self.y = y or 0
-  self.w = w or TILE_SIZE*0.2
-  self.h = h or TILE_SIZE*0.1
-  self.angle = angle or 0
+function Bullet:new(level)
+  Bullet.super.new(self, level, x, y, angle, TILE_SIZE*0.2, TILE_SIZE*0.1)
   self.tag = tag or nil
 
   self.bumpForce = 500
