@@ -66,7 +66,7 @@ function love.draw()
 	love.graphics.draw(sprites['red'], TILE_SIZE*2, TILE_SIZE*2)
 
 	if (DEBUG) then
-		draw_log()
+		draw_log(cameraToWorld(0, 0))
 	end
 end
 
@@ -100,7 +100,24 @@ function log(text)
 	log_text = text..'\n'..log_text
 end
 
-function draw_log()
+function draw_log(x, y)
 	love.graphics.setColor(1, 1, 1)
-	love.graphics.print(log_text, camera.x-love.graphics.getWidth()/2, camera.y-love.graphics.getHeight()/2)
+	love.graphics.print(log_text, x, y)
+end
+
+-- posiotioning utils
+function worldToCamera(wx, wy)
+  return wx-camera.x+love.graphics.getWidth()/2, wy-camera.y+love.graphics.getHeight()/2
+end
+
+function cameraToWorld(cx, cy)
+	return camera.x-love.graphics.getWidth()/2+cx, camera.y-love.graphics.getHeight()/2+cy
+end
+
+function dirToAngle(dx, dy)
+	return math.atan2(dy, dx)
+end
+
+function angleToDir(angle)
+	return math.cos(angle), math.sin(angle)
 end

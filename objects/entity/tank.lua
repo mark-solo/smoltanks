@@ -14,6 +14,7 @@ function Tank:new(level, x, y, controller, type)
   self.fireRate = 0.5
   self.fireTimer = 0
 
+  self.gun_angle = 0
   self.collider = level.world:newRectangleCollider(self.x, self.y, self.w, self.h)
   self.collider:setCollisionClass('Tank')
   self.collider:setObject(self)
@@ -29,17 +30,17 @@ function Tank:move(ds)
   self.ds = ds
 end
 
-function Tank:shoot()
+function Tank:setTurretTo(angle)
+  self.gun_angle = angle
+end
+
+function Tank:shoot(targetX, targetY)
   if self.fireTimer > self.fireRate then
     local bullet = level:getBullet()
 
-    local mouseX, mouseY = love.mouse.getPosition()
-    local gun_angle = math.atan2(mouseY-self.y+camera.y-love.graphics.getHeight()/2, mouseX-self.x+camera.x-love.graphics.getWidth()/2)
-
-    local dx = math.cos(gun_angle)
-    local dy = math.sin(gun_angle)
+    local dx, dy = angleToDir(self.gun_angle)
     local d = self.w+bullet.w+10
-    bullet:launch(d*dx+self.x, d*dy+self.y, gun_angle)
+    bullet:launch(d*dx+self.x, d*dy+self.y, self.gun_angle)
 
     local knockback = 500
     self.collider:applyLinearImpulse(-knockback*dx, -knockback*dy)
@@ -53,8 +54,7 @@ function Tank:input()
 end
 
 function Tank:movement(dt)
-  local dx = math.cos(self.angle)
-  local dy = math.sin(self.angle)
+  local dx, dy = angleToDir(self.angle)
   local dirX = self.ds*dx*self.moveSpeed*dt
   local dirY = self.ds*dy*self.moveSpeed*dt
 
@@ -96,8 +96,7 @@ function Tank:draw()
   love.graphics.translate(self.x, self.y)
 
   local mouseX, mouseY = love.mouse.getPosition()
-  local gun_angle = math.atan2(mouseY-self.y+camera.y-love.graphics.getHeight()/2, mouseX-self.x+camera.x-love.graphics.getWidth()/2)
-  love.graphics.rotate(gun_angle)
+  love.graphics.rotate(self.gun_angle)
 
   love.graphics.setColor(1, 1, 1)
   love.graphics.circle('line', 0, 0, self.h/2, 5)

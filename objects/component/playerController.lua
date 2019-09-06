@@ -19,6 +19,11 @@ function PlayerController:input(tank)
   if input:pressed('dup') then camera.scale = camera.scale*0.5 end
 	if input:pressed('ddown') then camera.scale = camera.scale*2 end
 
+  local mouseX, mouseY = love.mouse.getPosition()
+  local dirX = mouseX-tank.x
+  local dirY = mouseY-tank.y
+  tank:setTurretTo(dirToAngle(cameraToWorld(dirX, dirY)))
+
   if love.mouse.isDown(1) then
     tank:shoot()
   end

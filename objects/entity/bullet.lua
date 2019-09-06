@@ -18,8 +18,7 @@ function Bullet:new(level)
 end
 
 function Bullet:launch(x, y, angle)
-  local dx = math.cos(angle)
-  local dy = math.sin(angle)
+  local dx, dy = angleToDir(angle)
 
   self.x = x
   self.y = y
@@ -34,8 +33,7 @@ end
 function Bullet:update(dt)
   --self.angle = self.collider:getAngle()
   self.x, self.y = self.collider:getPosition()
-  local dx = math.cos(self.angle)
-  local dy = math.sin(self.angle)
+  local dx, dy = angleToDir(self.angle)
   --self.collider:applyForce(dx*self.bumpForce, dy*self.bumpForce)
   self.collider:setLinearVelocity(dx*self.bumpForce, dy*self.bumpForce)
 

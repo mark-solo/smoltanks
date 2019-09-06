@@ -59,9 +59,6 @@ function Level:draw()
 end
 
 -- pool functions
-function Level:initBullets(amount)
-  --
-end
 
 function Level:getBullet()
   local bullet = table.remove(self.bullets, 1)
