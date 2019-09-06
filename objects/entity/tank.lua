@@ -91,6 +91,7 @@ function Tank:movement(dt)
   self.collider:applyForce(dirX, dirY)
 
   self.x, self.y = self.collider:getPosition()
+  self.ds = 0
 end
 
 function Tank:rotation(dt)
@@ -99,6 +100,7 @@ function Tank:rotation(dt)
   self.collider:applyTorque(dirAngle)
 
   self.angle = self.collider:getAngle()
+  self.da = 0
 end
 
 function Tank:update(dt)
