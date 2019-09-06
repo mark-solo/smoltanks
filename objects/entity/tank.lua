@@ -1,7 +1,10 @@
-Player = Entity:extend()
+Tank = Entity:extend()
 
-function Player:new(level, x, y)
-  Bullet.super.new(self, level, x, y, 0, TILE_SIZE*0.7, TILE_SIZE*0.4)
+function Tank:new(level, x, y, controller, type)
+  Tank.super.new(self, level, x, y, 0, TILE_SIZE*0.7, TILE_SIZE*0.4)
+  self.level = level
+  self.controller = controller
+  self.type = type or nil
 
   self.da = 0
   self.turnSpeed = 10000*TILE_SIZE
@@ -12,21 +15,21 @@ function Player:new(level, x, y)
   self.fireTimer = 0
 
   self.collider = level.world:newRectangleCollider(self.x, self.y, self.w, self.h)
-  self.collider:setCollisionClass('Player')
+  self.collider:setCollisionClass('Tank')
   self.collider:setObject(self)
   self.collider:setLinearDamping(5)
   self.collider:setAngularDamping(5)
 end
 
-function Player:turn(da)
+function Tank:turn(da)
   self.da = da
 end
 
-function Player:move(ds)
+function Tank:move(ds)
   self.ds = ds
 end
 
-function Player:shoot()
+function Tank:shoot()
   if self.fireTimer > self.fireRate then
     local bullet = level:getBullet()
 
@@ -45,27 +48,11 @@ function Player:shoot()
   end
 end
 
-function Player:input()
-  local ds = 0
-  local da = 0
-
-  if input:down('forward') then ds = ds + 1 end
-  if input:down('back') then ds = ds - 1 end
-  if input:down('right') then da = da + 1 end
-  if input:down('left') then da = da - 1 end
-
-  self:move(ds)
-  self:turn(da)
-
-  if input:pressed('dup') then camera.scale = camera.scale*0.5 end
-	if input:pressed('ddown') then camera.scale = camera.scale*2 end
-
-  if love.mouse.isDown(1) then
-    self:shoot()
-  end
+function Tank:input()
+  self.controller:input(self)
 end
 
-function Player:movement(dt)
+function Tank:movement(dt)
   local dx = math.cos(self.angle)
   local dy = math.sin(self.angle)
   local dirX = self.ds*dx*self.moveSpeed*dt
@@ -76,7 +63,7 @@ function Player:movement(dt)
   self.x, self.y = self.collider:getPosition()
 end
 
-function Player:rotation(dt)
+function Tank:rotation(dt)
   local dirAngle = self.da*self.turnSpeed*dt
 
   self.collider:applyTorque(dirAngle)
@@ -84,14 +71,14 @@ function Player:rotation(dt)
   self.angle = self.collider:getAngle()
 end
 
-function Player:update(dt)
+function Tank:update(dt)
   self:rotation(dt)
   self:movement(dt)
 
   self.fireTimer = self.fireTimer + dt
 end
 
-function Player:draw()
+function Tank:draw()
   love.graphics.push()
   love.graphics.translate(self.x, self.y)
   love.graphics.rotate(self.angle)

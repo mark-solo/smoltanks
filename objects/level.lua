@@ -2,7 +2,7 @@ Level = Object:extend() -- store entities
 
 function Level:new(map, sizeX, sizeY)
   self.world = wf.newWorld(0, 0, true)
-  self.world:addCollisionClass('Player')
+  self.world:addCollisionClass('Tank')
   self.world:addCollisionClass('Bullet', {ignores = {'Bullet'}})
   self.world:addCollisionClass('Wall')
 
@@ -18,7 +18,8 @@ function Level:new(map, sizeX, sizeY)
   end
   --self.entities['bullet'] = Bullet(self, TILE_SIZE*2, TILE_SIZE, math.pi/2)
 
-  self.entities['player'] = Player(self, TILE_SIZE, TILE_SIZE)
+  local playerController = PlayerController()
+  self.entities['player'] = Tank(self, TILE_SIZE, TILE_SIZE, playerController)
 
   log('entities: '..inspect(self.entities, {depth=1}))
 end
