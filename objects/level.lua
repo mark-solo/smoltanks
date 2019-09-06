@@ -20,6 +20,8 @@ function Level:new(map, sizeX, sizeY)
 
   local playerController = PlayerController()
   self.entities['player'] = Tank(self, TILE_SIZE, TILE_SIZE, playerController)
+  local aiController = AIController()
+  self.entities['aitank'] = Tank(self, 2*TILE_SIZE, TILE_SIZE, aiController)
 
   log('entities: '..inspect(self.entities, {depth=1}))
 end

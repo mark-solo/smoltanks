@@ -38,7 +38,7 @@ function Bullet:update(dt)
   self.collider:setLinearVelocity(dx*self.bumpForce, dy*self.bumpForce)
 
   if self.collider:enter('Tank') or self.collider:exit('Tank') then
-    local collision_data = self.collider:getEnterCollisionData('Player')
+    local collision_data = self.collider:getEnterCollisionData('Tank')
     local tank = collision_data.collider:getObject()
 
     self.collider:setActive(false)

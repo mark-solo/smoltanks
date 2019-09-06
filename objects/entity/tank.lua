@@ -10,6 +10,7 @@ function Tank:new(level, x, y, controller, type)
   self.turnSpeed = 10000*TILE_SIZE
   self.ds = 0
   self.moveSpeed = 2000*TILE_SIZE
+  self.dangle = math.pi/30
 
   self.fireRate = 0.5
   self.fireTimer = 0
@@ -23,15 +24,44 @@ function Tank:new(level, x, y, controller, type)
 end
 
 function Tank:turn(da)
-  self.da = da
+  self.da = da<1 and da or 1
 end
 
 function Tank:move(ds)
-  self.ds = ds
+  self.ds = ds<1 and ds or 1
 end
 
 function Tank:setTurretTo(angle)
-  self.gun_angle = angle
+  local abs = math.abs(angle-self.gun_angle)
+  local sign = (angle-self.gun_angle)/abs
+
+
+  if abs > math.pi then
+    --log('-----')
+    angle = angle - sign*2*math.pi
+    abs = math.abs(angle-self.gun_angle)
+  end
+
+  if self.gun_angle > math.pi*2 and angle > math.pi*2 then
+    self.gun_angle = self.gun_angle - math.pi*2
+    angle = angle - math.pi*2
+  end
+  if self.gun_angle < -math.pi*2 and angle < -math.pi*2 then
+    self.gun_angle = self.gun_angle + math.pi*2
+    angle = angle + math.pi*2
+  end
+
+  --log(angle..' '..self.gun_angle..' '..abs)
+
+  local is = abs < self.dangle
+  if is then
+    self.gun_angle = angle
+  else
+    local sign = (angle-self.gun_angle)/abs
+    self.gun_angle = self.gun_angle + sign*self.dangle
+  end
+  --local b = a<1 and angle or self.gun_angle+self.dangle
+  --self.gun_angle = b
 end
 
 function Tank:shoot(targetX, targetY)
