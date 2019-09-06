@@ -55,6 +55,10 @@ function Level:draw()
   --self.player:draw()
   if (DEBUG) then
     self.world:draw(0.2)
+
+    local cx, cy = self.map:worldToPoint(cameraToWorld(love.mouse.getPosition()))
+    love.graphics.setColor(1, 1, 0)
+    love.graphics.print(cx..' '..cy..' '..self.map:pointToNum(cx+1, cy+1), cx*TILE_SIZE, cy*TILE_SIZE)
   end
 end
 

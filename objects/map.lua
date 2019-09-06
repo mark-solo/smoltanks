@@ -43,10 +43,12 @@ function Map:draw()
 end
 
 function Map:pointToNum(x, y)
-  local row = self.map[y]
-  return row[x]
+  local row = self.map[y] or -1
+  return row~=-1 and row[x] or -1
 end
 
-function Map:worldToPoint(x, y)
-
+function Map:worldToPoint(wx, wy)
+  local x = wx/TILE_SIZE
+  local y = wy/TILE_SIZE
+  return math.floor(x), math.floor(y)
 end
