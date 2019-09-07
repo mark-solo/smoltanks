@@ -1,4 +1,4 @@
-Level = Object:extend() -- store entities
+Level = Object:extend() -- store and init entities
 
 function Level:new(map, sizeX, sizeY)
   self.world = wf.newWorld(0, 0, true)
@@ -16,7 +16,6 @@ function Level:new(map, sizeX, sizeY)
     table.insert(self.bullets, bullet)
     table.insert(self.entities, bullet)
   end
-  --self.entities['bullet'] = Bullet(self, TILE_SIZE*2, TILE_SIZE, math.pi/2)
 
   local playerController = PlayerController()
   self.entities['player'] = Tank(self, TILE_SIZE, TILE_SIZE, playerController)
@@ -42,8 +41,7 @@ function Level:update(dt)
   for _, entity in pairs(self.entities) do
     entity:update(dt)
   end
-  --self.bullet:update(dt)
-  --self.player:update(dt)
+
   self.world:update(dt)
 end
 
@@ -53,15 +51,9 @@ function Level:draw()
   for _, entity in pairs(self.entities) do
     entity:draw()
   end
-  --self.bullet:draw()
-  --self.player:draw()
+
   if (DEBUG) then
     self.world:draw(0.2)
-
-    local cx, cy = self.map:worldToPoint(cameraToWorld(love.mouse.getPosition()))
-    love.graphics.setColor(1, 1, 0)
-    love.graphics.print(cx..' '..cy..' '..self.map:pointToNum(cx+1, cy+1), cx*TILE_SIZE, cy*TILE_SIZE)
-  end
 end
 
 -- pool functions
@@ -71,3 +63,5 @@ function Level:getBullet()
   table.insert(self.bullets, bullet)
   return bullet
 end
+
+-- pathfinding functions

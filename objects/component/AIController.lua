@@ -6,17 +6,12 @@ function AIController:new()
 end
 
 function AIController:input(tank)
-  -- check sensors
-  -- decide what to do
-  -- send command for action
-  --tank:turn(20)
   tank:setTurretTo(dirToAngle(self.targetX-tank.x, self.targetY-tank.y))
   tank:turn(dirToAngle(self.targetX-tank.x, self.targetY-tank.y)-tank.angle)
 
   if not self:isCloseToTarget(tank) then
     tank:move(1)
   end
-  --tank:shoot()
 end
 
 -- sensors

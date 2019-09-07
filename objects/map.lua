@@ -20,7 +20,7 @@ function Map:new(level, map, sizeX, sizeY)
   -- blocks
   for i=1,self.size.x do
     for j=1,self.size.y do
-      local num = self:pointToNum(i, j)
+      local num = self:pointToNum(i-1, j-1)
       if (num==1) then
         local block = self.level.world:newRectangleCollider((i-1)*TILE_SIZE, (j-1)*TILE_SIZE, TILE_SIZE, TILE_SIZE)
         block:setType('static')
@@ -33,7 +33,7 @@ end
 function Map:draw()
   for i=1,self.size.x do
     for j=1,self.size.y do
-      local num = self:pointToNum(i, j)
+      local num = self:pointToNum(i-1, j-1)
       if num==1 then love.graphics.setColor(1, 0, 0, 1)
       else love.graphics.setColor(1, 1, 1, 0.5) end
       love.graphics.rectangle('line', (i-1)*TILE_SIZE, (j-1)*TILE_SIZE, TILE_SIZE, TILE_SIZE)
@@ -43,12 +43,22 @@ function Map:draw()
 end
 
 function Map:pointToNum(x, y)
-  local row = self.map[y] or -1
-  return row~=-1 and row[x] or -1
+  local row = self.map[y+1] or -1
+  return row~=-1 and row[x+1] or -1
 end
 
 function Map:worldToPoint(wx, wy)
   local x = wx/TILE_SIZE
   local y = wy/TILE_SIZE
   return math.floor(x), math.floor(y)
+end
+
+function Map:pointToIndex(x, y)
+  return y*self.size.x+x
+end
+
+function Map:indexToPoint(index)
+  local y = index/self.size.x
+  local x = math.fmod(index, self.size.y)
+  return x, y
 end
