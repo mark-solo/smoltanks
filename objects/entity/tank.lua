@@ -100,6 +100,10 @@ function Tank:rotation(dt)
   self.collider:applyTorque(dirAngle)
 
   self.angle = self.collider:getAngle()
+  if self.angle > math.pi*2 then self.angle = self.angle - math.pi*2 end
+  if self.angle < -math.pi*2 then self.angle = self.angle + math.pi*2 end
+  self.collider:setAngle(self.angle)
+
   self.da = 0
 end
 

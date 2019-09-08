@@ -58,7 +58,7 @@ function Map:pointToIndex(x, y)
 end
 
 function Map:indexToPoint(index)
-  local y = index/self.size.x
+  local y = math.floor(index/self.size.x)
   local x = math.fmod(index, self.size.y)
   return x, y
 end
