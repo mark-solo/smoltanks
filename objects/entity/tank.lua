@@ -24,6 +24,13 @@ function Tank:new(level, x, y, controller, type)
 end
 
 function Tank:turn(da)
+  if da > math.pi then
+    da = da - math.pi*2
+  end
+  if da < -math.pi then
+    da = da + math.pi*2
+  end
+  
   self.da = da<1 and da or 1
 end
 
