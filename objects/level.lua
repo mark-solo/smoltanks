@@ -91,7 +91,10 @@ function Level:heuristic(current, goal)
   local cx, cy = self.map:indexToPoint(current)
   local gx, gy = self.map:indexToPoint(goal)
 
-  return math.sqrt(math.pow(cx-gx, 2)+math.pow(cy-gy, 2))
+  local dx = cx-gx
+  local dy = cy-gy
+
+  return math.sqrt(dx*dx+dy*dy)
 end
 
 function Level:getNodeWithLowestScore(open, fScore)

@@ -69,7 +69,7 @@ function Tank:shoot(targetX, targetY)
     local bullet = level:getBullet()
 
     local dx, dy = angleToDir(self.gun_angle)
-    local d = self.w+bullet.w+10
+    local d = self.w
     bullet:launch(d*dx+self.x, d*dy+self.y, self.gun_angle)
 
     local knockback = 500
