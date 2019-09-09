@@ -6,10 +6,10 @@ function AIController:new()
 end
 
 function AIController:input(tank)
+
   if not tank.path then
-    local start = tank.level.map:pointToIndex(tank.level.map:worldToPoint(tank.x, tank.y))
-    local goal = tank.level.map:pointToIndex(self.targetX, self.targetY)
-    tank.path = tank.level:aStar(start, goal)
+    local player = tank.level:getEntity('player')
+    tank.path = self:getPathTo(tank, (self.targetX+0.5)*TILE_SIZE, (self.targetY+0.5)*TILE_SIZE)
     tank.pathIndex = 1
   else
     local currentPoint = tank.path[tank.pathIndex]
@@ -47,4 +47,10 @@ function AIController:isCloseToTarget(tank, tx, ty, distance)
   local distance = distance or TILE_SIZE
   local real_distance = math.sqrt(math.pow(tank.x-tx, 2), math.pow(tank.y-ty, 2))
   return real_distance < distance
+end
+
+function AIController:getPathTo(tank, x, y)
+  local start = tank.level.map:pointToIndex(tank.level.map:worldToPoint(tank.x, tank.y))
+  local goal = tank.level.map:pointToIndex(tank.level.map:worldToPoint(x, y))
+  return tank.level:aStar(start, goal)
 end

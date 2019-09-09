@@ -9,12 +9,9 @@ function Bullet:new(level)
   self.collider = level.world:newRectangleCollider(self.x, self.y, self.w, self.h)
   self.collider:setAngle(self.angle)
   self.collider:setCollisionClass('Bullet')
-  self.collider:setCategory(1, 2)
-  self.collider:setMask(2)
+  self.collider:setMass(10)
   self.collider:setObject(self)
-  --self.collider:setBullet(true)
   self.collider:setActive(false)
-  --self.collider:setSensor(true)
 end
 
 function Bullet:launch(x, y, angle)
