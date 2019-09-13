@@ -9,7 +9,7 @@ function Bullet:new(level)
   self.collider = level.world:newRectangleCollider(self.x, self.y, self.w, self.h)
   self.collider:setAngle(self.angle)
   self.collider:setCollisionClass('Bullet')
-  self.collider:setMass(10)
+  self.collider:setMass(2)
   self.collider:setObject(self)
   self.collider:setActive(false)
 end
@@ -31,7 +31,7 @@ function Bullet:update(dt)
   --self.angle = self.collider:getAngle()
   self.x, self.y = self.collider:getPosition()
   local dx, dy = angleToDir(self.angle)
-  --self.collider:applyForce(dx*self.bumpForce, dy*self.bumpForce)
+  self.collider:setAngle(self.angle)
   self.collider:setLinearVelocity(dx*self.bumpForce, dy*self.bumpForce)
 
   if self.collider:enter('Tank') or self.collider:exit('Tank') then

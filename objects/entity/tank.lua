@@ -1,21 +1,22 @@
 Tank = Entity:extend()
 
 function Tank:new(level, x, y, controller, type)
-  Tank.super.new(self, level, x, y, 0, TILE_SIZE*0.7, TILE_SIZE*0.4)
+  Tank.super.new(self, level, x, y, 0, TILE_SIZE*0.55, TILE_SIZE*0.3)
   self.level = level
   self.controller = controller
   self.type = type or nil
 
   self.da = 0
-  self.turnSpeed = 10000*TILE_SIZE
+  self.turnSpeed = 5000*TILE_SIZE
   self.ds = 0
-  self.moveSpeed = 2000*TILE_SIZE
+  self.moveSpeed = 1000*TILE_SIZE
   self.dangle = math.pi/30
+  self.gun_angle = 0
 
   self.fireRate = 0.5
   self.fireTimer = 0
+  self.knockback = 200
 
-  self.gun_angle = 0
   self.collider = level.world:newRectangleCollider(self.x, self.y, self.w, self.h)
   self.collider:setCollisionClass('Tank')
   self.collider:setObject(self)
@@ -30,7 +31,7 @@ function Tank:turn(da)
   if da < -math.pi then
     da = da + math.pi*2
   end
-  
+
   self.da = da<1 and da or 1
 end
 
@@ -79,8 +80,7 @@ function Tank:shoot(targetX, targetY)
     local d = self.w
     bullet:launch(d*dx+self.x, d*dy+self.y, self.gun_angle)
 
-    local knockback = 500
-    self.collider:applyLinearImpulse(-knockback*dx, -knockback*dy)
+    self.collider:applyLinearImpulse(-self.knockback*dx, -self.knockback*dy)
 
     self.fireTimer = 0
   end
