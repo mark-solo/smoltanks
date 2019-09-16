@@ -11,12 +11,16 @@ function Tank:new(level, x, y, controller, type)
   self.ds = 0
   self.moveSpeed = 1000*TILE_SIZE
   self.dangle = math.pi/30
+  self.gun_angle = 0
 
   self.fireRate = 0.5
   self.fireTimer = 0
+<<<<<<< HEAD
   self.knockback = 250
+=======
+  self.knockback = 200
+>>>>>>> 776659a1dd64e4c22359d993b90630a650532cd0
 
-  self.gun_angle = 0
   self.collider = level.world:newRectangleCollider(self.x, self.y, self.w, self.h)
   self.collider:setCollisionClass('Tank')
   self.collider:setObject(self)
