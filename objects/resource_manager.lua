@@ -34,6 +34,42 @@ function ResourceManager:loadSprites()
 end
 
 function ResourceManager:loadLevels()
+  function test(r, g, b)
+    if (r==0 and g==0 and b==0) then return 1 end
+    if (r==1 and g==1 and b==1) then return 0 end
+
+    if (r==1 and g==0 and b==0) then return 10 end
+    if (r==1 and g==1 and b==0) then return 20 end
+
+    if (r==0 and g==0 and b==1) then return 11 end
+    if (r==0 and g==1 and b==1) then return 21 end
+  end
+
+  local level_files = {}
+  recursiveEnumerate('resources/levels', level_files)
+
+  for _, file in ipairs(level_files) do
+    local name = stripFileToName(file)
+    local imageData = love.image.newImageData(file)
+
+    local sizeX = imageData:getWidth()
+    local sizeY = imageData:getHeight()
+    local map = {}
+
+    for i=1,sizeY do
+      local row = {}
+      for j=1,sizeX do
+        local r, g, b = imageData:getPixel(j-1, i-1)
+        local num = test(r, g, b)
+
+        table.insert(row, num)
+      end
+      table.insert(map, row)
+    end
+
+    levels[name] = Level(map, sizeX, sizeY)
+  end
+
   local sizeX = 20
   local sizeY = 10
   local map = {}
