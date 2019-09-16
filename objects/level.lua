@@ -129,12 +129,20 @@ function Level:getNeighbours(node)
     if self.map:pointToNum(x+i, y)==0 then
       table.insert(neighbours, self.map:pointToIndex(x+i, y))
     end
-  end
-  for i=-1,1,2 do
     if self.map:pointToNum(x, y+i)==0 then
       table.insert(neighbours, self.map:pointToIndex(x, y+i))
     end
   end
+
+  -- for i=-1,1 do
+  --   for j=-1,1 do
+  --     if not (i==0 and j==0) then
+  --       if self.map:pointToNum(x+i, y+j)==0 then
+  --         table.insert(neighbours, self.map:pointToIndex(x+i, y+j))
+  --       end
+  --     end
+  --   end
+  -- end
 
   return neighbours
 end
@@ -168,7 +176,7 @@ function Level:aStar(start, goal)
     local neighbours = self:getNeighbours(current)
     for _, neighbour in ipairs(neighbours) do
       if find(closed, neighbour)==nil then
-        local t_gScore = (gScore[current] or 99998) + 1
+        local t_gScore = (gScore[current] or 99998) + self:heuristic(current, neighbour)
 
         if t_gScore < (gScore[neighbour] or 99999) then
           came_from[neighbour] = current
