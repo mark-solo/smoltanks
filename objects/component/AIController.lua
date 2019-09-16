@@ -6,10 +6,11 @@ function AIController:new()
 end
 
 function AIController:input(tank)
+  local player = tank.level:getEntity('player')
 
   if not tank.path then
-    local player = tank.level:getEntity('player')
-    tank.path = self:getPathTo(tank, (self.targetX+0.5)*TILE_SIZE, (self.targetY+0.5)*TILE_SIZE)
+    --tank.path = self:getPathTo(tank, (self.targetX+0.5)*TILE_SIZE, (self.targetY+0.5)*TILE_SIZE)
+    tank.path = self:getPathTo(tank, player.x, player.y)
     tank.pathIndex = 1
   else
     local currentPoint = tank.path[tank.pathIndex]
@@ -17,13 +18,18 @@ function AIController:input(tank)
     local cx = (cx+0.5)*TILE_SIZE
     local cy = (cy+0.5)*TILE_SIZE
 
-    tank:setTurretTo(dirToAngle(cx-tank.x, cy-tank.y))
+    --tank:setTurretTo(dirToAngle(cx-tank.x, cy-tank.y))
+    tank:setTurretTo(dirToAngle(player.x-tank.x, player.y-tank.y))
+    --tank:shoot()
     local dirAngle = dirToAngle(cx-tank.x, cy-tank.y)-tank.angle
     tank:turn(dirAngle)
 
     if self:isCloseToTarget(tank, cx, cy, TILE_SIZE) then
       if tank.pathIndex+1 <= #tank.path then
         tank.pathIndex = tank.pathIndex + 1
+      else
+        tank.path = self:getPathTo(tank, player.x, player.y)
+        tank.pathIndex = 1
       end
     else
       tank:move(1)
@@ -45,7 +51,7 @@ end
 
 function AIController:isCloseToTarget(tank, tx, ty, distance)
   local distance = distance or TILE_SIZE
-  local real_distance = math.sqrt(math.pow(tank.x-tx, 2), math.pow(tank.y-ty, 2))
+  local real_distance = math.sqrt(math.pow(tank.x-tx, 2)+math.pow(tank.y-ty, 2))
   return real_distance < distance
 end
 
