@@ -5,6 +5,7 @@ function Level:new(map, sizeX, sizeY)
   self.world:addCollisionClass('Tank')
   self.world:addCollisionClass('Bullet', {ignores = {'Bullet'}})
   self.world:addCollisionClass('Wall')
+  self.world:addCollisionClass('Spawn')
 
   self.map = Map(self, map, sizeX, sizeY)
 
@@ -59,7 +60,7 @@ function Level:draw()
   if (DEBUG) then
     self.world:draw(0.2)
 
-    local cx, cy = self.map:worldToPoint(cameraToWorld(love.mouse.getPosition()))
+    local cx, cy = worldToPoint(cameraToWorld(love.mouse.getPosition()))
     love.graphics.setColor(1, 1, 0)
     love.graphics.print(cx..' '..cy..' '..self.map:pointToNum(cx, cy)..' '..self.map:pointToIndex(cx, cy), cx*TILE_SIZE, cy*TILE_SIZE)
   end
@@ -111,16 +112,6 @@ function Level:getNodeWithLowestScore(open, fScore)
   return open[minIndex]
 end
 
-function find(tab, val)
-  for index, value in ipairs(tab) do
-    if value == val then
-      return index
-    end
-  end
-
-  return nil
-end
-
 function Level:getNeighbours(node)
   local neighbours = {}
   local x, y = self.map:indexToPoint(node)
@@ -133,16 +124,6 @@ function Level:getNeighbours(node)
       table.insert(neighbours, self.map:pointToIndex(x, y+i))
     end
   end
-
-  -- for i=-1,1 do
-  --   for j=-1,1 do
-  --     if not (i==0 and j==0) then
-  --       if self.map:pointToNum(x+i, y+j)==0 then
-  --         table.insert(neighbours, self.map:pointToIndex(x+i, y+j))
-  --       end
-  --     end
-  --   end
-  -- end
 
   return neighbours
 end

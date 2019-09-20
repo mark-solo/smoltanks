@@ -39,9 +39,9 @@ function ResourceManager:loadLevels()
     if (r==1 and g==1 and b==1) then return 0 end
 
     if (r==1 and g==0 and b==0) then return 10 end
-    if (r==1 and g==1 and b==0) then return 20 end
+    if (r==1 and g==1 and b==0) then return 11 end
 
-    if (r==0 and g==0 and b==1) then return 11 end
+    if (r==0 and g==0 and b==1) then return 20 end
     if (r==0 and g==1 and b==1) then return 21 end
   end
 
@@ -69,19 +69,4 @@ function ResourceManager:loadLevels()
 
     levels[name] = Level(map, sizeX, sizeY)
   end
-
-  local sizeX = 20
-  local sizeY = 10
-  local map = {}
-
-  for i=1,sizeY do
-    local row = {}
-    for j=1,sizeX do
-      local num = math.random()>0.9 and 1 or 0
-      table.insert(row, num)
-    end
-    table.insert(map, row)
-  end
-
-  levels['test'] = Level(map, sizeX, sizeY)
 end

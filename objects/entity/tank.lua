@@ -10,8 +10,8 @@ function Tank:new(level, x, y, controller, type)
   self.turnSpeed = 5000*TILE_SIZE
   self.ds = 0
   self.moveSpeed = 1000*TILE_SIZE
-  self.dangle = math.pi/30
-  self.gun_angle = 0
+  self.gunAngle = 0
+  self.turretTurnSpeed = math.pi/30
 
   self.fireRate = 0.5
   self.fireTimer = 0
@@ -40,45 +40,45 @@ function Tank:move(ds)
 end
 
 function Tank:setTurretTo(angle)
-  local abs = math.abs(angle-self.gun_angle)
-  local sign = (angle-self.gun_angle)/abs
+  local abs = math.abs(angle-self.gunAngle)
+  local sign = (angle-self.gunAngle)/abs
 
 
   if abs > math.pi then
     --log('-----')
     angle = angle - sign*2*math.pi
-    abs = math.abs(angle-self.gun_angle)
+    abs = math.abs(angle-self.gunAngle)
   end
 
-  if self.gun_angle > math.pi*2 and angle > math.pi*2 then
-    self.gun_angle = self.gun_angle - math.pi*2
+  if self.gunAngle > math.pi*2 and angle > math.pi*2 then
+    self.gunAngle = self.gunAngle - math.pi*2
     angle = angle - math.pi*2
   end
-  if self.gun_angle < -math.pi*2 and angle < -math.pi*2 then
-    self.gun_angle = self.gun_angle + math.pi*2
+  if self.gunAngle < -math.pi*2 and angle < -math.pi*2 then
+    self.gunAngle = self.gunAngle + math.pi*2
     angle = angle + math.pi*2
   end
 
-  --log(angle..' '..self.gun_angle..' '..abs)
+  --log(angle..' '..self.gunAngle..' '..abs)
 
-  local is = abs < self.dangle
+  local is = abs < self.turretTurnSpeed
   if is then
-    self.gun_angle = angle
+    self.gunAngle = angle
   else
-    local sign = (angle-self.gun_angle)/abs
-    self.gun_angle = self.gun_angle + sign*self.dangle
+    local sign = (angle-self.gunAngle)/abs
+    self.gunAngle = self.gunAngle + sign*self.turretTurnSpeed
   end
-  --local b = a<1 and angle or self.gun_angle+self.dangle
-  --self.gun_angle = b
+  --local b = a<1 and angle or self.gunAngle+self.turretTurnSpeed
+  --self.gunAngle = b
 end
 
 function Tank:shoot(targetX, targetY)
   if self.fireTimer > self.fireRate then
     local bullet = level:getBullet()
 
-    local dx, dy = angleToDir(self.gun_angle)
+    local dx, dy = angleToDir(self.gunAngle)
     local d = self.w
-    bullet:launch(d*dx+self.x, d*dy+self.y, self.gun_angle)
+    bullet:launch(d*dx+self.x, d*dy+self.y, self.gunAngle)
 
     self.collider:applyLinearImpulse(-self.knockback*dx, -self.knockback*dy)
 
@@ -139,7 +139,7 @@ function Tank:draw()
   love.graphics.translate(self.x, self.y)
 
   local mouseX, mouseY = love.mouse.getPosition()
-  love.graphics.rotate(self.gun_angle)
+  love.graphics.rotate(self.gunAngle)
 
   love.graphics.setColor(1, 1, 1)
   love.graphics.circle('line', 0, 0, self.h/2, 5)
