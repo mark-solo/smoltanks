@@ -17,8 +17,6 @@ function Map:new(level, map, sizeX, sizeY)
   --box = world:newRectangleCollider(love.graphics.getWidth()/2-50, love.graphics.getHeight()/2-30, 100, 60)
   for _, wall in ipairs(walls) do wall:setType('static') wall:setCollisionClass('Wall') end
 
-  self.spawnPoints = {}
-
   -- blocks
   for i=1,self.size.x do
     for j=1,self.size.y do
@@ -28,11 +26,8 @@ function Map:new(level, map, sizeX, sizeY)
         block:setType('static')
         block:setCollisionClass('Wall')
       elseif num==11 or num==21 then
-        local spawn = self.level.world:newRectangleCollider((i-1)*TILE_SIZE, (j-1)*TILE_SIZE, TILE_SIZE, TILE_SIZE)
-        spawn:setType('static')
-        spawn:setCollisionClass('Spawn')
-        spawn:setSensor(true)
-        table.insert(self.spawnPoints, spawn)
+        local spawnPoint = SpawnPoint(self.level, i-1, j-1)
+        table.insert(self.level.spawnPoints, spawnPoint)
       end
     end
   end

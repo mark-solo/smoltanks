@@ -7,9 +7,11 @@ function Level:new(map, sizeX, sizeY)
   self.world:addCollisionClass('Wall')
   self.world:addCollisionClass('Spawn')
 
-  self.map = Map(self, map, sizeX, sizeY)
-
   self.entities = {}
+
+  self.spawnPoints = {}
+  self.map = Map(self, map, sizeX, sizeY)
+  for _, spawnPoint in ipairs(self.spawnPoints) do table.insert(self.entities, spawnPoint) end
 
   self.bullets = {}
   for i=1,20 do
