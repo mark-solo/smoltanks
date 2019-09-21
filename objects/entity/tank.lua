@@ -22,6 +22,16 @@ function Tank:new(level, x, y, controller, type)
   self.collider:setObject(self)
   self.collider:setLinearDamping(5)
   self.collider:setAngularDamping(5)
+  self.collider:setActive(false)
+end
+
+function Tank:spawn(x, y)
+  self.collider:setActive(true)
+  self.collider:setPosition(x, y)
+  self.x, self.y = x, y
+  self.collider:setAngle(0)
+  self.angle = 0
+  self.fireTimer = 0
 end
 
 function Tank:turn(da)
@@ -73,7 +83,7 @@ function Tank:setTurretTo(angle)
 end
 
 function Tank:shoot(targetX, targetY)
-  if self.fireTimer > self.fireRate then
+  if self.collider:isActive() and self.fireTimer > self.fireRate then
     local bullet = level:getBullet()
 
     local dx, dy = angleToDir(self.gunAngle)
@@ -122,31 +132,33 @@ function Tank:update(dt)
 end
 
 function Tank:draw()
-  love.graphics.push()
-  love.graphics.translate(self.x, self.y)
-  love.graphics.rotate(self.angle)
+  if (self.collider:isActive()) then
+    love.graphics.push()
+    love.graphics.translate(self.x, self.y)
+    love.graphics.rotate(self.angle)
 
-  love.graphics.setColor(1, 1, 1)
-  love.graphics.line(0, 0, self.w/2, 0)
-  love.graphics.line(0, 0, self.w/2, self.h/2)
-  love.graphics.line(0, 0, self.w/2, -self.h/2)
-  love.graphics.rectangle('line', -self.w/2, -self.h/2, self.w, self.h)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.line(0, 0, self.w/2, 0)
+    love.graphics.line(0, 0, self.w/2, self.h/2)
+    love.graphics.line(0, 0, self.w/2, -self.h/2)
+    love.graphics.rectangle('line', -self.w/2, -self.h/2, self.w, self.h)
 
-  love.graphics.pop()
+    love.graphics.pop()
 
 
-  love.graphics.push()
-  love.graphics.translate(self.x, self.y)
+    love.graphics.push()
+    love.graphics.translate(self.x, self.y)
 
-  local mouseX, mouseY = love.mouse.getPosition()
-  love.graphics.rotate(self.gunAngle)
+    local mouseX, mouseY = love.mouse.getPosition()
+    love.graphics.rotate(self.gunAngle)
 
-  love.graphics.setColor(1, 1, 1)
-  love.graphics.circle('line', 0, 0, self.h/2, 5)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.circle('line', 0, 0, self.h/2, 5)
 
-  love.graphics.line(0, 0, self.h*1.2, 0)
-  love.graphics.line(0, 0, self.h/2*math.cos(-math.pi/2.5), self.h/2*math.sin(-math.pi/2.5))
-  love.graphics.line(0, 0, self.h/2*math.cos( math.pi/2.5), self.h/2*math.sin( math.pi/2.5))
+    love.graphics.line(0, 0, self.h*1.2, 0)
+    love.graphics.line(0, 0, self.h/2*math.cos(-math.pi/2.5), self.h/2*math.sin(-math.pi/2.5))
+    love.graphics.line(0, 0, self.h/2*math.cos( math.pi/2.5), self.h/2*math.sin( math.pi/2.5))
 
-  love.graphics.pop()
+    love.graphics.pop()
+  end
 end

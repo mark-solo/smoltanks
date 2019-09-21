@@ -20,10 +20,29 @@ function Level:new(map, sizeX, sizeY)
     table.insert(self.entities, bullet)
   end
 
+  self.tanks = {}
   local playerController = PlayerController()
-  self.entities['player'] = Tank(self, TILE_SIZE, TILE_SIZE, playerController)
+  local playerTank = Tank(self, TILE_SIZE, TILE_SIZE, playerController)
+  self.entities['player'] = playerTank
+  table.insert(self.tanks, playerTank)
+
   local aiController = AIController()
-  self.entities['aitank'] = Tank(self, 2*TILE_SIZE, TILE_SIZE, aiController)
+  local aiTank = Tank(self, 2*TILE_SIZE, TILE_SIZE, aiController)
+  self.entities['aitank'] = aiTank
+  table.insert(self.tanks, aiTank)
+
+  for _, tank in ipairs(self.tanks) do
+    if (self:getFreeSpawnPoint()~=nil) then
+      local spawnPoint = nil
+
+      while spawnPoint==nil or spawnPoint:isBusy() do
+        local num = math.random(#self.spawnPoints)
+        spawnPoint = self.spawnPoints[num]
+      end
+
+      tank:spawn(spawnPoint.x+TILE_SIZE/2, spawnPoint.y+TILE_SIZE/2)
+    end
+  end
 
   log('entities: '..inspect(self.entities, {depth=1}))
 end
@@ -74,6 +93,16 @@ function Level:getBullet()
   local bullet = table.remove(self.bullets, 1)
   table.insert(self.bullets, bullet)
   return bullet
+end
+
+function Level:getFreeSpawnPoint()
+  for _, spawnPoint in ipairs(self.spawnPoints) do
+    if not spawnPoint:isBusy() then
+      return spawnPoint
+    end
+  end
+
+  return nil
 end
 
 -- pathfinding functions
@@ -148,7 +177,6 @@ function Level:aStar(start, goal)
   fScore[start] = self:heuristic(start, goal)
 
   while #open>0 do
-    print(inspect(open))
     local current = self:getNodeWithLowestScore(open, fScore)
     if current == goal then
       return self:recontructPath(came_from, current)
