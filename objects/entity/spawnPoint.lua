@@ -18,12 +18,13 @@ end
 
 function SpawnPoint:update(dt)
   if self.tank~=nil then
-    -- spawn tank
+    self.tank:spawn(self.x+TILE_SIZE/2, self.y+TILE_SIZE/2)
+    self.tank = nil
   end
 end
 
 function SpawnPoint:isBusy()
-  return #self.collider:getContacts()>0
+  return #self.collider:getContacts()>0 and self.tank==nil
 end
 
 function SpawnPoint:draw()

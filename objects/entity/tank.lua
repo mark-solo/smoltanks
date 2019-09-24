@@ -1,7 +1,7 @@
 Tank = Entity:extend()
 
-function Tank:new(level, x, y, controller, type)
-  Tank.super.new(self, level, x, y, 0, TILE_SIZE*0.55, TILE_SIZE*0.3)
+function Tank:new(level, controller, type)
+  Tank.super.new(self, level, 0, 0, 0, TILE_SIZE*0.55, TILE_SIZE*0.3)
   self.level = level
   self.controller = controller
   self.type = type or nil

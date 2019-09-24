@@ -5,7 +5,7 @@ function Level:new(map, sizeX, sizeY)
   self.world:addCollisionClass('Tank')
   self.world:addCollisionClass('Bullet', {ignores = {'Bullet'}})
   self.world:addCollisionClass('Wall')
-  self.world:addCollisionClass('Spawn')
+  self.world:addCollisionClass('Spawn', {ignores = {'Spawn'}})
 
   self.entities = {}
 
@@ -22,14 +22,17 @@ function Level:new(map, sizeX, sizeY)
 
   self.tanks = {}
   local playerController = PlayerController()
-  local playerTank = Tank(self, TILE_SIZE, TILE_SIZE, playerController)
+  local playerTank = Tank(self, playerController)
   self.entities['player'] = playerTank
   table.insert(self.tanks, playerTank)
 
   local aiController = AIController()
-  local aiTank = Tank(self, 2*TILE_SIZE, TILE_SIZE, aiController)
-  self.entities['aitank'] = aiTank
-  table.insert(self.tanks, aiTank)
+  for i=1,2 do
+    local aiTank = Tank(self, aiController)
+    --self.entities['aitank'] = aiTank
+    table.insert(self.entities, aiTank)
+    table.insert(self.tanks, aiTank)
+  end
 
   for _, tank in ipairs(self.tanks) do
     if (self:getFreeSpawnPoint()~=nil) then
@@ -38,9 +41,12 @@ function Level:new(map, sizeX, sizeY)
       while spawnPoint==nil or spawnPoint:isBusy() do
         local num = math.random(#self.spawnPoints)
         spawnPoint = self.spawnPoints[num]
+
+        log((spawnPoint==nil and "|" or "O")+" "+num)
       end
 
-      tank:spawn(spawnPoint.x+TILE_SIZE/2, spawnPoint.y+TILE_SIZE/2)
+      spawnPoint.tank = tank
+      --tank:spawn(spawnPoint.x+TILE_SIZE/2, spawnPoint.y+TILE_SIZE/2)
     end
   end
 
