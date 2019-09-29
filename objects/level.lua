@@ -10,9 +10,18 @@ function Level:new(map, sizeX, sizeY)
   self.entities = {}
 
   self.spawnPoints = {}
+  -- TODO: write functions for plugging in and out maps
   self.map = Map(self, map, sizeX, sizeY)
   for _, spawnPoint in ipairs(self.spawnPoints) do table.insert(self.entities, spawnPoint) end
 
+  self:initEntities()
+
+  log('entities: '..inspect(self.entities, {depth=1}))
+end
+
+--
+
+function Level:initEntities()
   self.bullets = {}
   for i=1,20 do
     local bullet = Bullet(self)
@@ -48,9 +57,9 @@ function Level:new(map, sizeX, sizeY)
       --tank:spawn(spawnPoint.x+TILE_SIZE/2, spawnPoint.y+TILE_SIZE/2)
     end
   end
-
-  log('entities: '..inspect(self.entities, {depth=1}))
 end
+
+--
 
 function Level:getEntity(entityName)
   return self.entities[entityName]
