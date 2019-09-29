@@ -27,7 +27,7 @@ function Level:new(map, sizeX, sizeY)
   table.insert(self.tanks, playerTank)
 
   local aiController = AIController()
-  for i=1,2 do
+  for i=1,5 do
     local aiTank = Tank(self, aiController)
     --self.entities['aitank'] = aiTank
     table.insert(self.entities, aiTank)
@@ -41,8 +41,7 @@ function Level:new(map, sizeX, sizeY)
       while spawnPoint==nil or spawnPoint:isBusy() do
         local num = math.random(#self.spawnPoints)
         spawnPoint = self.spawnPoints[num]
-
-        log((spawnPoint==nil and "|" or "O")+" "+num)
+        log(((spawnPoint==nil or spawnPoint:isBusy()) and "|" or "O").." "..num)
       end
 
       spawnPoint.tank = tank

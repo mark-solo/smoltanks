@@ -24,7 +24,7 @@ function SpawnPoint:update(dt)
 end
 
 function SpawnPoint:isBusy()
-  return #self.collider:getContacts()>0 and self.tank==nil
+  return #self.collider:getContacts()>0 or self.tank~=nil
 end
 
 function SpawnPoint:draw()
