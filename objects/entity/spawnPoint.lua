@@ -8,12 +8,16 @@ function SpawnPoint:new(level, px, py)
 
   self.entitiyCount = 0
 
-  self.collider = level.world:newRectangleCollider(px*TILE_SIZE, py*TILE_SIZE, TILE_SIZE, TILE_SIZE)
+  self.collider = world:newRectangleCollider(px*TILE_SIZE, py*TILE_SIZE, TILE_SIZE, TILE_SIZE)
   self.collider:setType('static')
   self.collider:setCollisionClass('Spawn')
   self.collider:setSensor(true)
 
   self.tank = nil -- tank to spawn
+end
+
+function SpawnPoint:setActive(value)
+  self.collider:setActive(value)
 end
 
 function SpawnPoint:update(dt)

@@ -6,7 +6,8 @@ function ResourceManager:new()
   sprites = {}
   self:loadSprites()
 
-  levels = {}
+  --levels = {}
+  maps = {}
   self:loadLevels()
 
   -- level state = {}
@@ -67,6 +68,7 @@ function ResourceManager:loadLevels()
       table.insert(map, row)
     end
 
-    levels[name] = Level(map, sizeX, sizeY)
+    --levels[name] = Level(map, sizeX, sizeY)
+    maps[name] = Map(map, sizeX, sizeY)
   end
 end

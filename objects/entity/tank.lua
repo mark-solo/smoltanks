@@ -17,7 +17,7 @@ function Tank:new(level, controller, type)
   self.fireTimer = 0
   self.knockback = 250
 
-  self.collider = level.world:newRectangleCollider(self.x, self.y, self.w, self.h)
+  self.collider = world:newRectangleCollider(self.x, self.y, self.w, self.h)
   self.collider:setCollisionClass('Tank')
   self.collider:setObject(self)
   self.collider:setLinearDamping(5)
@@ -84,7 +84,7 @@ end
 
 function Tank:shoot(targetX, targetY)
   if self.collider:isActive() and self.fireTimer > self.fireRate then
-    local bullet = level:getBullet()
+    local bullet = self.level:getBullet()
 
     local dx, dy = angleToDir(self.gunAngle)
     local d = self.w

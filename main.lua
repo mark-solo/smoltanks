@@ -24,6 +24,12 @@ function love.load()
   recursiveEnumerate('objects', object_files)
   requireFiles(object_files)
 
+	world = wf.newWorld(0, 0, true)
+  world:addCollisionClass('Tank')
+  world:addCollisionClass('Bullet', {ignores = {'Bullet'}})
+  world:addCollisionClass('Wall')
+  world:addCollisionClass('Spawn', {ignores = {'Spawn'}})
+
   --world = wf.newWorld(0, 0, true)
 	r = ResourceManager()
 
@@ -39,8 +45,8 @@ function love.load()
 	input:bind('left', 'dleft')
 	input:bind('right', 'dright')
 
-
-	scene = GameScene('level01')
+	gameScene = GameScene('level01')
+	scene = gameScene
 
 	camera = Camera()
 	--camera.scale = 0.25
@@ -49,6 +55,7 @@ end
 function love.update(dt)
 	scene:input()
 	scene:update(dt)
+	world:update(dt)
 
 	fixedUpdateTimer = fixedUpdateTimer + dt
 	if fixedUpdateTimer > fixedUpdateRate then
@@ -66,12 +73,14 @@ function love.draw()
 	--love.graphics.draw(sprites['red'], TILE_SIZE*2, TILE_SIZE*2)
 
 	if (DEBUG) then
+		world:draw(0.2)
+
 		draw_log(cameraToWorld(0, 0))
 	end
 end
 
 function love.event.quit()
-	for _, level in ipairs(levels) do level.world.destroy() end
+	world.destroy()
 end
 
 ---------

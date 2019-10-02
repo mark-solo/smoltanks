@@ -6,7 +6,7 @@ function Bullet:new(level)
 
   self.bumpForce = 500
 
-  self.collider = level.world:newRectangleCollider(self.x, self.y, self.w, self.h)
+  self.collider = world:newRectangleCollider(self.x, self.y, self.w, self.h)
   self.collider:setAngle(self.angle)
   self.collider:setCollisionClass('Bullet')
   self.collider:setMass(1)
