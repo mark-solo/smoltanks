@@ -18,7 +18,7 @@ function Pathfinding.update(dt)
 end
 
 function Pathfinding.getPath(requester, map, start, goal)
-  local start = Pathfinding.inspectAndFixPoint(map, start, goal)
+  --local start = Pathfinding.inspectAndFixPoint(map, start, goal)
   local goal = Pathfinding.inspectAndFixPoint(map, goal, start)
 
   local request_params = {}

@@ -30,8 +30,8 @@ function AIController:input(tank)
           tank.pathIndex = tank.pathIndex + 1
         else
           --log("path ended")
-          --tank.path = self:getPathTo(tank, player.x, player.y)
-          --tank.pathIndex = 1
+          tank.path = self:getPathTo(tank, player.x, player.y)
+          tank.pathIndex = 1
         end
       else
         tank:move(1)

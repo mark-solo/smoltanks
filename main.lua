@@ -75,6 +75,7 @@ function love.draw()
 		world:draw(0.2)
 
 		draw_log(cameraToWorld(0, 0))
+		love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), cameraToWorld(love.graphics.getWidth()-100, 0))
 	end
 end
 
