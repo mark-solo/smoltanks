@@ -1,5 +1,30 @@
 Pathfinding = Object:extend()
 
+Pathfinding.queue = {}
+Pathfinding.order = {}
+
+function Pathfinding.update(dt)
+  --log('queue '..inspect(Pathfinding.order, {depth=1}))
+  local tank = table.remove(Pathfinding.order, 1)
+  if tank~=nil then
+    local r_params = Pathfinding.queue[tank]
+    log('made a path '..tank.id..' '..r_params.start..':'..r_params.goal)
+    tank.path = Pathfinding.aStar(r_params.map, r_params.start, r_params.goal)
+  end
+end
+
+function Pathfinding.getPath(requester, map, start, goal)
+  local request_params = {}
+  request_params.map = map
+  request_params.start = start
+  request_params.goal = goal
+
+  Pathfinding.queue[requester] = request_params
+  local index = find(Pathfinding.order, requester)
+  if index~=nil then table.remove(Pathfinding.order, index) end
+  table.insert(Pathfinding.order, requester)
+end
+
 function Pathfinding.recontructPath(came_from, current)
   local total_path = {}
 

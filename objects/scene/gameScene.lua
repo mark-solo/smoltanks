@@ -86,6 +86,7 @@ end
 
 function GameScene:update(dt)
   --level:update(dt)
+  Pathfinding.update(dt)
   self.map:update(dt)
 
   for _, entity in pairs(self.entities) do
@@ -97,7 +98,7 @@ end
 
 function GameScene:render()
   --level:draw()
-
+  camera:apply()
   self.map:draw()
 
   for _, entity in pairs(self.entities) do
@@ -127,105 +128,6 @@ function GameScene:getFreeSpawnPoint()
   for _, spawnPoint in ipairs(self.map.spawnPoints) do
     if not spawnPoint:isBusy() then
       return spawnPoint
-    end
-  end
-
-  return nil
-end
-
---
-
-function GameScene:recontructPath(came_from, current)
-  local total_path = {}
-
-  local c = current
-  while c~=nil do
-    table.insert(total_path, 1, c)
-    c = came_from[c]
-  end
-
-  return total_path
-end
-
-function GameScene:heuristic(current, goal)
-  local cx, cy = self.map:indexToPoint(current)
-  local gx, gy = self.map:indexToPoint(goal)
-
-  local dx = cx-gx
-  local dy = cy-gy
-
-  return math.sqrt(dx*dx+dy*dy)
-end
-
-function GameScene:getNodeWithLowestScore(open, fScore)
-  local minIndex = -1
-  local min = 99999
-
-  for i=1,#open do
-    if min >= (fScore[open[i]] or 9999) then
-      minIndex = i
-      min = fScore[open[i]]
-    end
-  end
-
-  return open[minIndex]
-end
-
-function GameScene:getNeighbours(node)
-  local neighbours = {}
-  local x, y = self.map:indexToPoint(node)
-
-  for i=-1,1,2 do
-    if self.map:pointToNum(x+i, y)==0 then
-      table.insert(neighbours, self.map:pointToIndex(x+i, y))
-    end
-    if self.map:pointToNum(x, y+i)==0 then
-      table.insert(neighbours, self.map:pointToIndex(x, y+i))
-    end
-  end
-
-  return neighbours
-end
-
-function GameScene:aStar(start, goal)
-  -- TODO: check start and goal for walkability and move if needed
-
-  local open = {}
-  table.insert(open, start)
-  local closed = {}
-
-  local came_from = {}
-
-  -- for node stores cost of shortest path to this node from start
-  local gScore = {} -- default to infinity, please
-  gScore[start] = 0
-
-  -- f(n) = g(n) + h(n)
-  local fScore = {} -- default to infinity, please
-  fScore[start] = self:heuristic(start, goal)
-
-  while #open>0 do
-    local current = self:getNodeWithLowestScore(open, fScore)
-    if current == goal then
-      return self:recontructPath(came_from, current)
-    end
-
-    table.remove(open, find(open, current))
-    table.insert(closed, current)
-    local neighbours = self:getNeighbours(current)
-    for _, neighbour in ipairs(neighbours) do
-      if find(closed, neighbour)==nil then
-        local t_gScore = (gScore[current] or 99998) + self:heuristic(current, neighbour)
-
-        if t_gScore < (gScore[neighbour] or 99999) then
-          came_from[neighbour] = current
-          gScore[neighbour] = t_gScore
-          fScore[neighbour] = gScore[neighbour] + self:heuristic(neighbour, goal)
-          if find(open, neighbour)==nil then
-            table.insert(open, neighbour)
-          end
-        end
-      end
     end
   end
 

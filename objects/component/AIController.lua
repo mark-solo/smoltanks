@@ -9,7 +9,7 @@ function AIController:input(tank)
   local player = tank.level:getEntity('player')
 
   if player.collider:isActive() then
-    if not tank.path then
+    if not tank.path or tank.path==nil then
       --tank.path = self:getPathTo(tank, (self.targetX+0.5)*TILE_SIZE, (self.targetY+0.5)*TILE_SIZE)
       tank.path = self:getPathTo(tank, player.x, player.y)
       tank.pathIndex = 1
@@ -60,5 +60,5 @@ end
 function AIController:getPathTo(tank, x, y)
   local start = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
   local goal = tank.level.map:pointToIndex(worldToPoint(x, y))
-  return Pathfinding.aStar(tank.level.map, start, goal)
+  return Pathfinding.getPath(tank, tank.level.map, start, goal)
 end
