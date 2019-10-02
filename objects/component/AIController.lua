@@ -60,5 +60,5 @@ end
 function AIController:getPathTo(tank, x, y)
   local start = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
   local goal = tank.level.map:pointToIndex(worldToPoint(x, y))
-  return tank.level:aStar(start, goal)
+  return Pathfinding.aStar(tank.level.map, start, goal)
 end
