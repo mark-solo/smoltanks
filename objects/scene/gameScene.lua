@@ -60,7 +60,7 @@ end
 -- resetGame
 
 function GameScene:loadMap(mapName)
-  self.map = maps[mapName]:insert(self)
+  maps[mapName]:insert(self)
 end
 
 function GameScene:reset()

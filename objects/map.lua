@@ -61,7 +61,10 @@ function Map:insert(scene)
 end
 
 function Map:eject()
-  -- disable all walls, blocks and spawnPoints
+  for _, wall in ipairs(self.walls) do wall:setActive(false) end
+  for _, block in ipairs(self.blocks) do block:setActive(false) end
+  for _, spawnPoint in ipairs(self.spawnPoints) do spawnPoint:setActive(false) end
+  for _, flag in ipairs(self.flags) do flag:setActive(false) end
 
   log("map eject")
 end
@@ -74,12 +77,12 @@ end
 
 function Map:draw()
   local colorsToDraw = {}
-  colorsToDraw[0] = {0, 0, 0}
-  colorsToDraw[1] = {1, 1, 1}
-  colorsToDraw[10] = {1, 0, 0}
-  colorsToDraw[20] = {0, 0, 1}
-  colorsToDraw[11] = {1, 1, 0}
-  colorsToDraw[21] = {0, 1, 1}
+  colorsToDraw[0] = {0, 0, 0} -- air
+  colorsToDraw[1] = {1, 1, 1} -- wall
+  colorsToDraw[10] = {1, 0, 0} -- red flag
+  colorsToDraw[20] = {0, 0, 1} -- blue flag
+  colorsToDraw[11] = {1, 1, 0} -- red spawn
+  colorsToDraw[21] = {0, 1, 1} -- blue spawn
 
   for i=1,self.w do
     for j=1,self.h do
@@ -98,6 +101,8 @@ function Map:draw()
   end
 end
 
+--
+
 function Map:pointToNum(x, y)
   local row = self.map[y+1] or -1
   return row~=-1 and row[x+1] or -1
@@ -111,4 +116,11 @@ function Map:indexToPoint(index)
   local y = math.floor(index/self.w)
   local x = math.fmod(index, self.w)
   return x, y
+end
+
+--
+
+function Map:isWalkable(x, y)
+  local num = self:pointToNum(x, y)
+  return num==0
 end

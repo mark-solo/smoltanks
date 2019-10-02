@@ -9,6 +9,21 @@ function find(tab, val)
   return nil
 end
 
+function min(tab)
+  --if #tab == 0 then return nil, nil end
+
+  local key = next(tab)
+  local min = tab[key]
+
+  for k, v in pairs(tab) do
+      if tab[k] < min then
+          key, min = k, v
+      end
+  end
+
+  return key, min
+end
+
 -- posiotioning utils
 function worldToCamera(wx, wy)
   return wx-camera.x+love.graphics.getWidth()/2, wy-camera.y+love.graphics.getHeight()/2

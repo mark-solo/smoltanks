@@ -8,12 +8,19 @@ function Pathfinding.update(dt)
   local tank = table.remove(Pathfinding.order, 1)
   if tank~=nil then
     local r_params = Pathfinding.queue[tank]
-    log('made a path '..tank.id..' '..r_params.start..':'..r_params.goal)
+
     tank.path = Pathfinding.aStar(r_params.map, r_params.start, r_params.goal)
+
+    if tank.path~=nil then
+      log('made a path '..tank.id..' '..r_params.start..':'..r_params.goal)
+    end
   end
 end
 
 function Pathfinding.getPath(requester, map, start, goal)
+  local start = Pathfinding.inspectAndFixPoint(map, start, goal)
+  local goal = Pathfinding.inspectAndFixPoint(map, goal, start)
+
   local request_params = {}
   request_params.map = map
   request_params.start = start
@@ -24,6 +31,38 @@ function Pathfinding.getPath(requester, map, start, goal)
   if index~=nil then table.remove(Pathfinding.order, index) end
   table.insert(Pathfinding.order, requester)
 end
+
+--
+
+-- check if point is unwalkable and moves it somewhere walkable,
+-- closer to relativeTo
+function Pathfinding.inspectAndFixPoint(map, point, relativeTo)
+  if point == relativeTo then return point end
+
+  local new_point = point
+  local is_walkable = false
+
+  while not is_walkable do
+    local neighbours = Pathfinding.getNeighbours(map, new_point)
+    if #neighbours==0 then return new_point end -- well, fuck
+
+    local neighbours_with_distance = {}
+    for _, neighbour in ipairs(neighbours) do
+      neighbours_with_distance[neighbour] = Pathfinding.heuristic(map, new_point, relativeTo)
+    end
+
+    new_point = min(neighbours_with_distance)
+
+    print(inspect(new_point))
+
+    local x, y = map:indexToPoint(new_point)
+    is_walkable = map:isWalkable(x, y)
+  end
+
+  return new_point
+end
+
+--
 
 function Pathfinding.recontructPath(came_from, current)
   local total_path = {}
@@ -66,10 +105,11 @@ function Pathfinding.getNeighbours(map, node)
   local x, y = map:indexToPoint(node)
 
   for i=-1,1,2 do
-    if map:pointToNum(x+i, y)==0 then
+    --if map:pointToNum(x+i, y)==0 then
+    if map:isWalkable(x+i, y) then
       table.insert(neighbours, map:pointToIndex(x+i, y))
     end
-    if map:pointToNum(x, y+i)==0 then
+    if map:isWalkable(x, y+i) then
       table.insert(neighbours, map:pointToIndex(x, y+i))
     end
   end
