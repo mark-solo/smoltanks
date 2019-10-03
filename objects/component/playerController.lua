@@ -4,6 +4,10 @@ function PlayerController:new()
 
 end
 
+function PlayerController:init(tank)
+
+end
+
 function PlayerController:input(tank)
   local ds = 0
   local da = 0

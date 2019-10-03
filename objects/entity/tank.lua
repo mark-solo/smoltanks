@@ -5,7 +5,7 @@ function Tank:new(level, controller, type)
   self.level = level
   self.controller = controller
   self.type = type or nil
-  self.id = math.random(1000)
+  --self.id = math.random(1000)
 
   self.da = 0
   self.turnSpeed = 5000*TILE_SIZE
@@ -33,6 +33,12 @@ function Tank:spawn(x, y)
   self.collider:setAngle(0)
   self.angle = 0
   self.fireTimer = 0
+
+  self.controller:init(self)
+end
+
+function Tank:death()
+  self.collider:setActive(false)
 end
 
 function Tank:turn(da)

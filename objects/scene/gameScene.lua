@@ -38,21 +38,7 @@ function GameScene:initEntities()
     table.insert(self.tanks, aiTank)
   end
 
-
-  for _, tank in ipairs(self.tanks) do
-    if (self:getFreeSpawnPoint()~=nil) then
-      local spawnPoint = nil
-
-      while spawnPoint==nil or spawnPoint:isBusy() do
-        local num = math.random(#self.map.spawnPoints)
-        spawnPoint = self.map.spawnPoints[num]
-        log(((spawnPoint==nil or spawnPoint:isBusy()) and "|" or "O").." "..num)
-      end
-
-      spawnPoint.tank = tank
-      --tank:spawn(spawnPoint.x+TILE_SIZE/2, spawnPoint.y+TILE_SIZE/2)
-    end
-  end
+  self:spawnTanksIfNeeded()
 end
 
 -- new
@@ -67,6 +53,23 @@ function GameScene:reset()
   if self.map==nil then
     log('don\'t have map to make things happen')
     return nil
+  end
+end
+
+function GameScene:spawnTanksIfNeeded()
+  for _, tank in ipairs(self.tanks) do
+    if not tank.collider:isActive() and self:getFreeSpawnPoint()~=nil then
+      local spawnPoint = nil
+
+      while spawnPoint==nil or spawnPoint:isBusy() do
+        local num = math.random(#self.map.spawnPoints)
+        spawnPoint = self.map.spawnPoints[num]
+        log(((spawnPoint==nil or spawnPoint:isBusy()) and "|" or "O").." "..num)
+      end
+
+      spawnPoint.tank = tank
+      --tank:spawn(spawnPoint.x+TILE_SIZE/2, spawnPoint.y+TILE_SIZE/2)
+    end
   end
 end
 
@@ -86,6 +89,7 @@ end
 
 function GameScene:update(dt)
   --level:update(dt)
+  self:spawnTanksIfNeeded()
   Pathfinding.update(dt)
   self.map:update(dt)
 

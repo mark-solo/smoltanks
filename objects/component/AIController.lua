@@ -5,6 +5,13 @@ function AIController:new()
   self.targetY = 5
 end
 
+function AIController:init(tank)
+  local player = tank.level:getEntity('player')
+
+  tank.path = self:getPathTo(tank, player.x, player.y)
+  tank.pathIndex = 1
+end
+
 function AIController:input(tank)
   local player = tank.level:getEntity('player')
 

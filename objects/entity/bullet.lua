@@ -38,6 +38,7 @@ function Bullet:update(dt)
     local collision_data = self.collider:getEnterCollisionData('Tank')
     local tank = collision_data.collider:getObject()
 
+    tank:death()
     self.collider:setActive(false)
   end
 
