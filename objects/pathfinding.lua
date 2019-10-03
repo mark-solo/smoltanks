@@ -54,8 +54,6 @@ function Pathfinding.inspectAndFixPoint(map, point, relativeTo)
 
     new_point = min(neighbours_with_distance)
 
-    print(inspect(new_point))
-
     local x, y = map:indexToPoint(new_point)
     is_walkable = map:isWalkable(x, y)
   end

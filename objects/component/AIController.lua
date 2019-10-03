@@ -107,7 +107,7 @@ end
 
 function AIController:moveAlongPath(tank)
   local currentPoint = tank.path[tank.pathIndex]
-  if currentPoint==nil then self:requestPath(tank, player.x, player.y) end
+  if currentPoint==nil then self:requestPath(tank, player.x, player.y) return end
   local cx, cy = tank.level.map:indexToPoint(currentPoint)
   local cx = (cx+0.5)*TILE_SIZE
   local cy = (cy+0.5)*TILE_SIZE

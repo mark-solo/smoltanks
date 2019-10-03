@@ -30,7 +30,7 @@ function worldToCamera(wx, wy)
 end
 
 function cameraToWorld(cx, cy)
-	return camera.x+(cx-love.graphics.getWidth()/2)/camera.scale, camera.y+(cy-love.graphics.getHeight()/2)/camera.scale
+	return camera.x+cx-love.graphics.getWidth()/2, camera.y+cy-love.graphics.getHeight()/2
 end
 
 function dirToAngle(dx, dy)
