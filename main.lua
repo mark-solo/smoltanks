@@ -12,13 +12,15 @@ TILE_SIZE = 64
 local fixedUpdateRate = 0.02
 local fixedUpdateTimer = 0
 
-local log_text = 'init'
+local log_text = {}
+local last_logline_repeated = 0
 
 timer = 0
 
 function love.load()
 	--love.window.setMode(640, 480)
 	love.window.setMode(TILE_SIZE*8, TILE_SIZE*8)
+	log('init')
 
 	local object_files = {}
   recursiveEnumerate('objects', object_files)
@@ -105,11 +107,40 @@ function requireFiles(files)
     end
 end
 
-function log(text)
-	log_text = text..'\n'..log_text
+--
+
+function log(text, type)
+	local type = type or 'info'
+
+	local last_line = log_text[1]
+	if last_line~=nil and last_line.text == text and last_line.type == type then
+		last_logline_repeated = last_logline_repeated + 1
+	else
+		local message = {}
+
+		if last_logline_repeated > 1 then
+			message.text = 'last message was repeated '..last_logline_repeated..' times'
+			message.type = 'warning'
+		else
+			message.text = text
+			message.type = type
+		end
+
+		table.insert(log_text, 1, message)
+		last_logline_repeated = 0
+	end
 end
 
 function draw_log(x, y)
-	love.graphics.setColor(1, 1, 1)
-	love.graphics.print(log_text, x, y)
+	local colors_for_types = {}
+	colors_for_types['info'] = {1, 1, 1, 0.5}
+	colors_for_types['warning'] = {1, 1, 0, 0.75}
+	colors_for_types['error'] = {1, 0, 0, 1}
+
+	for i, message in ipairs(log_text) do
+		love.graphics.setColor(colors_for_types[message.type])
+		
+		love.graphics.print('['..(#log_text-i)..']', x, y+(i-1)*12)
+		love.graphics.print(message.text, x+50, y+(i-1)*12)
+	end
 end

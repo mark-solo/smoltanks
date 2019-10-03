@@ -12,7 +12,8 @@ function Pathfinding.update(dt)
     tank.path = Pathfinding.aStar(r_params.map, r_params.start, r_params.goal)
 
     if tank.path~=nil then
-      log('made a path '..tank.id..' '..r_params.start..':'..r_params.goal)
+      --log('made a path '..tank.id..' '..r_params.start..':'..r_params.goal)
+      log('made a path '..r_params.start..':'..r_params.goal)
     end
   end
 end
