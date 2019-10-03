@@ -20,9 +20,9 @@ function AIController:input(tank)
     if not tank.path or tank.path==nil then
       tank.path = self:requestPath(tank, player.x, player.y)
     else
-      --self:moveAlongPath(tank)
-      self:moveTo(tank, player.x, player.y)
-    self:courseCorrent(tank)
+      self:moveAlongPath(tank)
+      --self:moveTo(tank, player.x, player.y)
+      self:courseCorrent(tank)
     end
   end
 end
@@ -65,6 +65,10 @@ function AIController:draw(tank)
   else love.graphics.setColor(1, 1, 1, 0.5) end
   love.graphics.line(tx1, ty1, txR2, tyR2)
 
+  if self:doSeeCollider(tank, player.collider) then
+    love.graphics.setColor(1, 0, 0)
+    love.graphics.ellipse('fill', tank.x, tank.y, tank.h/2, tank.h/2)
+  end
 end
 
 ---- AI parts
@@ -82,6 +86,14 @@ function AIController:isTouching(tank, angle, distance)
   local tx2, ty2 = tank.x+distance*math.cos(tank.angle+angle), tank.y+distance*math.sin(tank.angle+angle)
   local cols = world:queryLine(tx1, ty1, tx2, ty2, {'All', except={'Spawn'}})
   return #cols > 0
+end
+
+function AIController:doSeeCollider(tank, collider)
+  local tx1, ty1 = tank.x, tank.y
+  local tx2, ty2 = collider:getPosition()
+
+  local cols = world:queryLine(tx1, ty1, tx2, ty2, {'All'})
+  return not (#cols>1)
 end
 
 -- actions
