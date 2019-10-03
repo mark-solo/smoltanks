@@ -139,7 +139,7 @@ function draw_log(x, y)
 
 	for i, message in ipairs(log_text) do
 		love.graphics.setColor(colors_for_types[message.type])
-		
+
 		love.graphics.print('['..(#log_text-i)..']', x, y+(i-1)*12)
 		love.graphics.print(message.text, x+50, y+(i-1)*12)
 	end

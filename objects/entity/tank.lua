@@ -49,11 +49,12 @@ function Tank:turn(da)
     da = da + math.pi*2
   end
 
-  da = da<1 and da or 1
-  da = da>-1 and da or -1
+  --da = da<1 and da or 1
+  --da = da>-1 and da or -1
 
-  self.da = self.da + da
-  --self.da = da
+  --self.da = self.da + da
+  self.da = da<1 and da or 1
+  self.da = da>-1 and da or -1
 end
 
 function Tank:move(ds)

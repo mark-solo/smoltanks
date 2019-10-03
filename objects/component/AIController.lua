@@ -157,12 +157,12 @@ function AIController:courseCorrent(tank)
   local angle = math.pi/4
   local distance = TILE_SIZE/2
 
-  local d = 1
+  local d = 0.5
 
-  if self:isTouching(tank, 0, distance) then tank:turn(d) tank.ds = 0 end
+  if self:isTouching(tank, 0, distance) then tank:move(-1) end
   if self:isTouching(tank, -angle, distance) then tank:turn(d) end
   if self:isTouching(tank, angle, distance) then tank:turn(-d) end
 
-  if self:isTouching(tank, -angle/2, distance*2) then tank:turn(d) end
-  if self:isTouching(tank, angle/2, distance*2) then tank:turn(-d) end
+  if self:isTouching(tank, -angle/2, distance*2) then tank:turn(2*d) end
+  if self:isTouching(tank, angle/2, distance*2) then tank:turn(-2*d) end
 end

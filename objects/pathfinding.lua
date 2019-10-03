@@ -78,7 +78,7 @@ function Pathfinding.optimizePath(map, path)
     local x2, y2 = map:indexToPoint(next_point)
     local cols = world:queryLine((x1+0.5)*TILE_SIZE, (y1+0.5)*TILE_SIZE,
                                  (x2+0.5)*TILE_SIZE, (y2+0.5)*TILE_SIZE,
-                                 {'All'})
+                                 {'Wall'})
 
     if (#cols>0) then
       table.insert(new_path, current_point)
