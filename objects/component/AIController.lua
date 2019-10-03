@@ -96,6 +96,11 @@ function AIController:doSeeCollider(tank, collider)
   return not (#cols>1)
 end
 
+function AIController:doSee(tank, targetX, targetY)
+  local cols = world:queryLine(tank.x, tank.y, targetX, targetY, {'All'})
+  return not (#cols > 0)
+end
+
 -- actions
 
 function AIController:requestPath(tank, x, y)
