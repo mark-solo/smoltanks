@@ -9,7 +9,9 @@ function Pathfinding.update(dt)
   if tank~=nil then
     local r_params = Pathfinding.queue[tank]
 
-    tank.path = Pathfinding.aStar(r_params.map, r_params.start, r_params.goal)
+    local path =  Pathfinding.aStar(r_params.map, r_params.start, r_params.goal)
+    path = Pathfinding.optimizePath(r_params.map, path)
+    tank.path = path
 
     if tank.path~=nil then
       --log('made a path '..tank.id..' '..r_params.start..':'..r_params.goal)
@@ -59,6 +61,34 @@ function Pathfinding.inspectAndFixPoint(map, point, relativeTo)
   end
 
   return new_point
+end
+
+function Pathfinding.optimizePath(map, path)
+  if path==nil or #path<=2 then return path end
+
+  local new_path = {}
+  table.insert(new_path, path[1])
+  local last_point = path[1]
+
+  for i=1,#path-1 do
+    local current_point = path[i]
+    local next_point = path[i+1]
+
+    local x1, y1 = map:indexToPoint(last_point)
+    local x2, y2 = map:indexToPoint(next_point)
+    local cols = world:queryLine((x1+0.5)*TILE_SIZE, (y1+0.5)*TILE_SIZE,
+                                 (x2+0.5)*TILE_SIZE, (y2+0.5)*TILE_SIZE,
+                                 {'All'})
+
+    if (#cols>0) then
+      table.insert(new_path, current_point)
+      last_point = current_point
+    end
+  end
+
+  table.insert(new_path, path[#path])
+
+  return new_path
 end
 
 --

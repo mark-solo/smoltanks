@@ -29,7 +29,15 @@ end
 
 function AIController:draw(tank)
   if tank.path then
-    love.graphics.setColor(0, 1, 0)
+    love.graphics.setColor(0, 1, 0, 0.5)
+    for i=1,#tank.path-1 do
+      local x1, y1 = tank.level.map:indexToPoint(tank.path[i])
+      local x2, y2 = tank.level.map:indexToPoint(tank.path[i+1])
+
+      love.graphics.line((x1+0.5)*TILE_SIZE, (y1+0.5)*TILE_SIZE,
+                         (x2+0.5)*TILE_SIZE, (y2+0.5)*TILE_SIZE)
+    end
+
     for _, point in ipairs(tank.path) do
       local x, y = tank.level.map:indexToPoint(point)
       love.graphics.ellipse('fill', (x+0.5)*TILE_SIZE, (y+0.5)*TILE_SIZE, 5, 5)
