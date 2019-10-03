@@ -53,6 +53,7 @@ function Tank:turn(da)
   da = da>-1 and da or -1
 
   self.da = self.da + da
+  --self.da = da
 end
 
 function Tank:move(ds)

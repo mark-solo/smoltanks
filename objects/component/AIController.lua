@@ -20,10 +20,9 @@ function AIController:input(tank)
     if not tank.path or tank.path==nil then
       tank.path = self:requestPath(tank, player.x, player.y)
     else
-      self:moveAlongPath(tank)
-      --if tank.ds > 0 then
-        self:courseCorrent(tank)
-    --  end
+      --self:moveAlongPath(tank)
+      self:moveTo(tank, player.x, player.y)
+    self:courseCorrent(tank)
     end
   end
 end
@@ -38,15 +37,21 @@ function AIController:draw(tank)
   end
 
   local angle = math.pi/4
-  local distance = 50
+  local distance = TILE_SIZE/2
   local tx1, ty1 = tank.x, tank.y
   local txL, tyL = tank.x+distance*math.cos(tank.angle-angle), tank.y+distance*math.sin(tank.angle-angle)
+  local txL2, tyL2 = tank.x+2*distance*math.cos(tank.angle-angle/2), tank.y+2*distance*math.sin(tank.angle-angle/2)
   local txC, tyC = tank.x+distance*math.cos(tank.angle), tank.y+distance*math.sin(tank.angle)
   local txR, tyR = tank.x+distance*math.cos(tank.angle+angle), tank.y+distance*math.sin(tank.angle+angle)
+  local txR2, tyR2 = tank.x+2*distance*math.cos(tank.angle+angle/2), tank.y+2*distance*math.sin(tank.angle+angle/2)
 
   if self:isTouching(tank, -angle, distance) then love.graphics.setColor(1, 1, 1)
   else love.graphics.setColor(1, 1, 1, 0.5) end
   love.graphics.line(tx1, ty1, txL, tyL)
+
+  if self:isTouching(tank, -angle/2, distance*2) then love.graphics.setColor(1, 1, 1)
+  else love.graphics.setColor(1, 1, 1, 0.5) end
+  love.graphics.line(tx1, ty1, txL2, tyL2)
 
   if self:isTouching(tank, 0, distance) then love.graphics.setColor(1, 1, 1)
   else love.graphics.setColor(1, 1, 1, 0.5) end
@@ -55,6 +60,10 @@ function AIController:draw(tank)
   if self:isTouching(tank, angle, distance) then love.graphics.setColor(1, 1, 1)
   else love.graphics.setColor(1, 1, 1, 0.5) end
   love.graphics.line(tx1, ty1, txR, tyR)
+
+  if self:isTouching(tank, angle/2, distance*2) then love.graphics.setColor(1, 1, 1)
+  else love.graphics.setColor(1, 1, 1, 0.5) end
+  love.graphics.line(tx1, ty1, txR2, tyR2)
 
 end
 
@@ -86,7 +95,7 @@ end
 
 function AIController:moveAlongPath(tank)
   local currentPoint = tank.path[tank.pathIndex]
-  if currentPoint==nil then return end
+  if currentPoint==nil then self:requestPath(tank, player.x, player.y) end
   local cx, cy = tank.level.map:indexToPoint(currentPoint)
   local cx = (cx+0.5)*TILE_SIZE
   local cy = (cy+0.5)*TILE_SIZE
@@ -109,18 +118,26 @@ function AIController:moveAlongPath(tank)
   end
 end
 
+function AIController:moveTo(tank, targetX, targetY)
+  tank:setTurretTo(dirToAngle(targetX-tank.x, targetY-tank.y))
+  local dirAngle = dirToAngle(targetX-tank.x, targetY-tank.y)-tank.angle
+  tank:turn(dirAngle)
+
+  if not self:isCloseToTarget(tank, targetX, targetY, TILE_SIZE) then
+    tank:move(1)
+  end
+end
+
 function AIController:courseCorrent(tank)
   local angle = math.pi/4
-  local distance = 50
-  --local tx1, ty1 = tank.x, tank.y
-  --local txL, tyL = tank.x+distance*math.cos(tank.angle-angle), tank.y+distance*math.sin(tank.angle-angle)
-  --local txR, tyR = tank.x+distance*math.cos(tank.angle+angle), tank.y+distance*math.sin(tank.angle+angle)
+  local distance = TILE_SIZE/2
 
   local d = 1
 
-  if self:isTouching(tank, 0, distance) then tank.ds = 0 end
+  if self:isTouching(tank, 0, distance) then tank:turn(d) tank.ds = 0 end
   if self:isTouching(tank, -angle, distance) then tank:turn(d) end
   if self:isTouching(tank, angle, distance) then tank:turn(-d) end
 
-  if self:isTouching(tank, 2*angle, distance/2) then end
+  if self:isTouching(tank, -angle/2, distance*2) then tank:turn(d) end
+  if self:isTouching(tank, angle/2, distance*2) then tank:turn(-d) end
 end
