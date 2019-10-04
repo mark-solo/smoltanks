@@ -52,13 +52,11 @@ function Tank:turn(da)
   --da = da<1 and da or 1
   --da = da>-1 and da or -1
 
-  --self.da = self.da + da
-  self.da = da<1 and da or 1
-  self.da = da>-1 and da or -1
+  self.da = self.da + da
 end
 
 function Tank:move(ds)
-  self.ds = ds<1 and ds or 1
+  self.ds = self.ds + ds
 end
 
 function Tank:setTurretTo(angle)
@@ -109,10 +107,15 @@ function Tank:shoot(targetX, targetY)
 end
 
 function Tank:input()
-  self.controller:input(self)
+  if self.collider:isActive() then
+    self.controller:input(self)
+  end
 end
 
 function Tank:movement(dt)
+  self.ds = self.ds<1 and self.ds or 1
+  self.ds = self.ds>-1 and self.ds or -1
+
   local dx, dy = angleToDir(self.angle)
   local dirX = self.ds*dx*self.moveSpeed*dt
   local dirY = self.ds*dy*self.moveSpeed*dt
@@ -124,6 +127,8 @@ function Tank:movement(dt)
 end
 
 function Tank:rotation(dt)
+  self.da = self.da<1 and self.da or 1
+  self.da = self.da>-1 and self.da or -1
   local dirAngle = self.da*self.turnSpeed*dt
 
   self.collider:applyTorque(dirAngle)

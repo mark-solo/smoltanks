@@ -8,12 +8,23 @@ function AIController:new()
 end
 
 function AIController:init(tank)
-  local player = tank.level:getEntity('player')
+  player = tank.level:getEntity('player')
 
   self:requestPath(tank, player.x, player.y)
+
+  tank.sensors = {}
+  table.insert(tank.sensors, self.makeSensor(-math.pi/4, TILE_SIZE/2,    1))
+  table.insert(tank.sensors, self.makeSensor( math.pi/4, TILE_SIZE/2,   -1))
+  table.insert(tank.sensors, self.makeSensor(-math.pi/8,   TILE_SIZE,  0.5,  -0.25))
+  table.insert(tank.sensors, self.makeSensor( math.pi/8,   TILE_SIZE, -0.5,  -0.25))
+  table.insert(tank.sensors, self.makeSensor(         0, TILE_SIZE/2,    1, -2))
 end
 
 function AIController:input(tank)
+  for _, sensor in ipairs(tank.sensors) do
+    self.checkSensor(tank, sensor)
+  end
+
   player = tank.level:getEntity('player')
 
   if player.collider:isActive() then
@@ -23,6 +34,7 @@ function AIController:input(tank)
       self:moveAlongPath(tank)
       --self:moveTo(tank, player.x, player.y)
       self:courseCorrent(tank)
+
     end
   end
 end
@@ -44,34 +56,9 @@ function AIController:draw(tank)
     end
   end
 
-  local angle = math.pi/4
-  local distance = TILE_SIZE/2
-  local tx1, ty1 = tank.x, tank.y
-  local txL, tyL = tank.x+distance*math.cos(tank.angle-angle), tank.y+distance*math.sin(tank.angle-angle)
-  local txL2, tyL2 = tank.x+2*distance*math.cos(tank.angle-angle/2), tank.y+2*distance*math.sin(tank.angle-angle/2)
-  local txC, tyC = tank.x+distance*math.cos(tank.angle), tank.y+distance*math.sin(tank.angle)
-  local txR, tyR = tank.x+distance*math.cos(tank.angle+angle), tank.y+distance*math.sin(tank.angle+angle)
-  local txR2, tyR2 = tank.x+2*distance*math.cos(tank.angle+angle/2), tank.y+2*distance*math.sin(tank.angle+angle/2)
-
-  if self:isTouching(tank, -angle, distance) then love.graphics.setColor(1, 1, 1)
-  else love.graphics.setColor(1, 1, 1, 0.5) end
-  love.graphics.line(tx1, ty1, txL, tyL)
-
-  if self:isTouching(tank, -angle/2, distance*2) then love.graphics.setColor(1, 1, 1)
-  else love.graphics.setColor(1, 1, 1, 0.5) end
-  love.graphics.line(tx1, ty1, txL2, tyL2)
-
-  if self:isTouching(tank, 0, distance) then love.graphics.setColor(1, 1, 1)
-  else love.graphics.setColor(1, 1, 1, 0.5) end
-  love.graphics.line(tx1, ty1, txC, tyC)
-
-  if self:isTouching(tank, angle, distance) then love.graphics.setColor(1, 1, 1)
-  else love.graphics.setColor(1, 1, 1, 0.5) end
-  love.graphics.line(tx1, ty1, txR, tyR)
-
-  if self:isTouching(tank, angle/2, distance*2) then love.graphics.setColor(1, 1, 1)
-  else love.graphics.setColor(1, 1, 1, 0.5) end
-  love.graphics.line(tx1, ty1, txR2, tyR2)
+  for _, sensor in ipairs(tank.sensors) do
+    self.drawSensor(tank, sensor)
+  end
 
   if self:doSeeCollider(tank, player.collider) then
     love.graphics.setColor(1, 0, 0)
@@ -107,6 +94,35 @@ end
 function AIController:doSee(tank, targetX, targetY)
   local cols = world:queryLine(tank.x, tank.y, targetX, targetY, {'All'})
   return not (#cols > 0)
+end
+
+--
+
+function AIController.makeSensor(angle, distance, turnAngle, moveSpeed)
+  local sensor = {}
+  sensor.angle = angle
+  sensor.distance = distance
+  sensor.turnAngle = turnAngle
+  sensor.moveSpeed = moveSpeed or nil
+  sensor.boop = false
+
+  return sensor
+end
+
+function AIController.checkSensor(tank, sensor)
+  local tx = tank.x + sensor.distance*math.cos(tank.angle+sensor.angle)
+  local ty = tank.y + sensor.distance*math.sin(tank.angle+sensor.angle)
+  local cols = world:queryLine(tank.x, tank.y, tx, ty, {'All', except={'Spawn'}})
+  sensor.boop = #cols>0
+  return sensor.boop
+end
+
+function AIController.drawSensor(tank, sensor)
+  local tx = tank.x + sensor.distance*math.cos(tank.angle+sensor.angle)
+  local ty = tank.y + sensor.distance*math.sin(tank.angle+sensor.angle)
+
+  love.graphics.setColor(1, 1, 1, sensor.boop and 1 or 0.5)
+  love.graphics.line(tank.x, tank.y, tx, ty)
 end
 
 -- actions
@@ -159,10 +175,17 @@ function AIController:courseCorrent(tank)
 
   local d = 0.5
 
-  if self:isTouching(tank, 0, distance) then tank:move(-1) end
-  if self:isTouching(tank, -angle, distance) then tank:turn(d) end
-  if self:isTouching(tank, angle, distance) then tank:turn(-d) end
+  for _, sensor in ipairs(tank.sensors) do
+    if sensor.boop then
+      tank:turn(sensor.turnAngle)
+      if sensor.moveSpeed~=nil then tank:move(sensor.moveSpeed) end
+    end
+  end
 
-  if self:isTouching(tank, -angle/2, distance*2) then tank:turn(2*d) end
-  if self:isTouching(tank, angle/2, distance*2) then tank:turn(-2*d) end
+  --if tank.sensors['center'].boop then tank:move(-1) end
+  --if self:isTouching(tank, -angle, 2*distance) then tank:turn(d) end
+  --if self:isTouching(tank, angle, 2*distance) then tank:turn(-d) end
+
+  --if tank.sensors['far_left'].boop then tank:turn(-2*d) tank:move(0) end
+  --if tank.sensors['far_left'].boop then tank:turn(2*d) tank:move(0) end
 end

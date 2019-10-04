@@ -33,7 +33,6 @@ function GameScene:initEntities()
   local aiController = AIController()
   for i=1,5 do
     local aiTank = Tank(self, aiController)
-    --self.entities['aitank'] = aiTank
     table.insert(self.entities, aiTank)
     table.insert(self.tanks, aiTank)
   end
