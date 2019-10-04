@@ -13,11 +13,13 @@ function AIController:init(tank)
   self:requestPath(tank, player.x, player.y)
 
   tank.sensors = {}
-  table.insert(tank.sensors, self.makeSensor(-math.pi/4, TILE_SIZE/2,    1))
-  table.insert(tank.sensors, self.makeSensor( math.pi/4, TILE_SIZE/2,   -1))
-  table.insert(tank.sensors, self.makeSensor(-math.pi/8,   TILE_SIZE,  0.5,  -0.25))
-  table.insert(tank.sensors, self.makeSensor( math.pi/8,   TILE_SIZE, -0.5,  -0.25))
-  table.insert(tank.sensors, self.makeSensor(         0, TILE_SIZE/2,    1, -2))
+  table.insert(tank.sensors, self.makeSensor(-math.pi/4, TILE_SIZE/2,    0.5,  -0.1))
+  table.insert(tank.sensors, self.makeSensor( math.pi/4, TILE_SIZE/2,   -0.5,  -0.1))
+  table.insert(tank.sensors, self.makeSensor(-math.pi/8,   TILE_SIZE*0.6,  1.1,  -1.5))
+  table.insert(tank.sensors, self.makeSensor( math.pi/8,   TILE_SIZE*0.6, -1.25,  -1.5))
+  tank.sensors['center'] = nil
+  table.insert(tank.sensors, self.makeSensor(         0, TILE_SIZE*0.65,  0.4 , -1.5))
+  table.insert(tank.sensors, self.makeSensor(   math.pi, TILE_SIZE/2,  0 , 2))
 end
 
 function AIController:input(tank)

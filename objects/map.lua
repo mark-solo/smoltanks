@@ -38,12 +38,6 @@ function Map:new(map, sizeX, sizeY)
 end
 
 function Map:insert(scene)
-  -- if levels current map is not null
-  --   eject current map
-  -- set current map to new map
-  -- insert this map, i.e.:
-  --   1. enable all walls, blocks and spawnPoints
-
   if scene.map~=nil then
     scene.map:eject()
   end

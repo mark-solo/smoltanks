@@ -5,11 +5,7 @@ function GameScene:new()
 
   self.entities = {}
 
-  self.spawnPoints = {}
-  -- TODO: write functions for plugging in and out maps
-  --self.map = Map(self, map, sizeX, sizeY)
   self:loadMap('level01')
-  --for _, spawnPoint in ipairs(self.spawnPoints) do table.insert(self.entities, spawnPoint) end
 
   self:initEntities()
 
@@ -60,6 +56,7 @@ function GameScene:spawnTanksIfNeeded()
     if not tank.collider:isActive() and self:getFreeSpawnPoint()~=nil then
       local spawnPoint = nil
 
+      -- TODO: make fix for when all spawnPoints are busy
       while spawnPoint==nil or spawnPoint:isBusy() do
         local num = math.random(#self.map.spawnPoints)
         spawnPoint = self.map.spawnPoints[num]

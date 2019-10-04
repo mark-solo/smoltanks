@@ -7,10 +7,13 @@ function Tank:new(level, controller, type)
   self.type = type or nil
   --self.id = math.random(1000)
 
+  local d = 4
   self.da = 0
-  self.turnSpeed = 5000*TILE_SIZE
+  --self.turnSpeed = 5000*TILE_SIZE
+  self.turnSpeed = d*1000*TILE_SIZE
   self.ds = 0
-  self.moveSpeed = 1000*TILE_SIZE
+  --self.moveSpeed = 1000*TILE_SIZE
+  self.moveSpeed = d*200*TILE_SIZE
   self.gunAngle = 0
   self.turretTurnSpeed = math.pi/30
 
