@@ -12,14 +12,16 @@ function AIController:init(tank)
 
   self:requestPath(tank, player.x, player.y)
 
-  tank.sensors = {}
-  table.insert(tank.sensors, self.makeSensor(-math.pi/4, TILE_SIZE/2,    0.5,  -0.1))
-  table.insert(tank.sensors, self.makeSensor( math.pi/4, TILE_SIZE/2,   -0.5,  -0.1))
-  table.insert(tank.sensors, self.makeSensor(-math.pi/8,   TILE_SIZE*0.6,  1.1,  -1.5))
-  table.insert(tank.sensors, self.makeSensor( math.pi/8,   TILE_SIZE*0.6, -1.25,  -1.5))
-  tank.sensors['center'] = nil
-  table.insert(tank.sensors, self.makeSensor(         0, TILE_SIZE*0.65,  0.4 , -1.5))
-  table.insert(tank.sensors, self.makeSensor(   math.pi, TILE_SIZE/2,  0 , 2))
+  if tank.sensors==nil then
+    tank.sensors = {}
+    table.insert(tank.sensors, self.makeSensor(-math.pi/4, TILE_SIZE/2,    0.5,  -0.1))
+    table.insert(tank.sensors, self.makeSensor( math.pi/4, TILE_SIZE/2,   -0.5,  -0.1))
+    table.insert(tank.sensors, self.makeSensor(-math.pi/8,   TILE_SIZE*0.6,  1.1,  -1.5))
+    table.insert(tank.sensors, self.makeSensor( math.pi/8,   TILE_SIZE*0.6, -1.25,  -1.5))
+    tank.sensors['center'] = nil
+    table.insert(tank.sensors, self.makeSensor(         0, TILE_SIZE*0.65,  0.4 , -1.5))
+    table.insert(tank.sensors, self.makeSensor(   math.pi, TILE_SIZE/2,  0 , 2))
+  end
 end
 
 function AIController:input(tank)
@@ -36,6 +38,8 @@ function AIController:input(tank)
       self:moveAlongPath(tank)
       --self:moveTo(tank, player.x, player.y)
       self:courseCorrent(tank)
+
+      -- TODO: request new path if stuck in one node for too long
 
     end
   end

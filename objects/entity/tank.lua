@@ -180,5 +180,9 @@ function Tank:draw()
     love.graphics.line(0, 0, self.h/2*math.cos( math.pi/2.5), self.h/2*math.sin( math.pi/2.5))
 
     love.graphics.pop()
+
+    if DEBUG and self.controller.draw then
+      self.controller:draw(self)
+    end
   end
 end

@@ -27,13 +27,13 @@ function GameScene:initEntities()
   table.insert(self.tanks, playerTank)
 
   local aiController = AIController()
-  for i=1,5 do
+  for i=1,2 do
     local aiTank = Tank(self, aiController)
     table.insert(self.entities, aiTank)
     table.insert(self.tanks, aiTank)
   end
 
-  self:spawnTanksIfNeeded()
+  --self:spawnTanksIfNeeded()
 end
 
 -- new
@@ -103,10 +103,6 @@ function GameScene:render()
 
   for _, entity in pairs(self.entities) do
     entity:draw()
-
-    if DEBUG and entity:is(Tank) and entity.controller.draw then
-      entity.controller:draw(entity)
-    end
   end
 
   if (DEBUG) then

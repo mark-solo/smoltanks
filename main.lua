@@ -77,7 +77,7 @@ function love.draw()
 		world:draw(0.2)
 
 		draw_log(cameraToWorld(0, 0))
-		love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), cameraToWorld(love.graphics.getWidth()-100, 0))
+		love.graphics.print("FPS: "..tostring(love.timer.getFPS( )), cameraToWorld(love.graphics.getWidth()-50, 0))
 	end
 end
 
@@ -127,6 +127,7 @@ function log(text, type)
 		end
 
 		table.insert(log_text, 1, message)
+		if #log_text > 50 then table.remove(log_text) end
 		last_logline_repeated = 0
 	end
 end
@@ -139,8 +140,6 @@ function draw_log(x, y)
 
 	for i, message in ipairs(log_text) do
 		love.graphics.setColor(colors_for_types[message.type])
-
-		love.graphics.print('['..(#log_text-i)..']', x, y+(i-1)*12)
-		love.graphics.print(message.text, x+50, y+(i-1)*12)
+		love.graphics.print(message.text, x, y+(i-1)*12)
 	end
 end
