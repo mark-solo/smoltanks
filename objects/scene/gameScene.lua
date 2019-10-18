@@ -1,7 +1,8 @@
 GameScene = Scene:extend() -- controls game logic
 
 function GameScene:new()
-  --level = levels[levelName]
+  self.timer = 0
+  self.state = self.game
 
   self.entities = {}
 
@@ -11,6 +12,41 @@ function GameScene:new()
 
   log('entities: '..inspect(self.entities, {depth=1}))
 end
+
+-- function states
+
+function GameScene:init(dt)
+
+end
+
+function GameScene:reset(dt)
+
+end
+
+function GameScene:game(dt)
+  self:spawnTanksIfNeeded()
+  Pathfinding.update(dt)
+  self.map:update(dt)
+
+  for _, entity in pairs(self.entities) do
+    entity:update(dt)
+  end
+
+  camera:setPos(self:getEntity('player').x, self:getEntity('player').y)
+end
+
+function GameScene:final(dt)
+
+end
+
+function GameScene:test(dt)
+  if self.timer > 1 then
+    log("hello test "..self.timer, "error")
+    self.timer = 0
+  end
+end
+
+--
 
 function GameScene:initEntities()
   self.bullets = {}
@@ -36,9 +72,9 @@ function GameScene:initEntities()
   --self:spawnTanksIfNeeded()
 end
 
--- new
--- insertMap
--- resetGame
+function GameScene:onEnter()
+  log("gameScene loaded")
+end
 
 function GameScene:loadMap(mapName)
   maps[mapName]:insert(self)
@@ -84,16 +120,12 @@ function GameScene:input()
 end
 
 function GameScene:update(dt)
-  --level:update(dt)
-  self:spawnTanksIfNeeded()
-  Pathfinding.update(dt)
-  self.map:update(dt)
+  local next_state = self:state(dt)
 
-  for _, entity in pairs(self.entities) do
-    entity:update(dt)
-  end
+  if next_state then self.state = next_state end
+  if self.state == self.game then log("huh") end
 
-  camera:setPos(self:getEntity('player').x, self:getEntity('player').y)
+  self.timer = self.timer + dt
 end
 
 function GameScene:render()

@@ -48,7 +48,8 @@ function love.load()
 	input:bind('right', 'dright')
 
 	gameScene = GameScene('level01')
-	scene = gameScene
+	Scene.setScene(gameScene)
+	--scene = gameScene
 
 	camera = Camera()
 	--camera.scale = 0.25
