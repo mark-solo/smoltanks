@@ -5,6 +5,8 @@ function GameScene:new()
   self.state = self.init
 
   self.entities = {}
+  self.redTeam = {}
+  self.blueTeam = {}
 
   log('entities: '..inspect(self.entities, {depth=1}))
 end
@@ -24,7 +26,8 @@ function GameScene:reset(dt)
 end
 
 function GameScene:game(dt)
-  self:spawnTanksIfNeeded()
+  self:spawnTanksIfNeeded(self.redTeam, self.map.redSpawns)
+  self:spawnTanksIfNeeded(self.blueTeam, self.map.blueSpawns)
   Pathfinding.update(dt)
   self.map:update(dt)
 
@@ -49,8 +52,6 @@ end
 --------------------
 
 function GameScene:input()
-  --level:input()
-
   for _, entity in pairs(self.entities) do
     if entity.input then
       entity:input()
@@ -104,13 +105,22 @@ function GameScene:initEntities()
   local playerController = PlayerController()
   local playerTank = Tank(self, playerController)
   self.entities['player'] = playerTank
-  table.insert(self.tanks, playerTank)
+  --table.insert(self.tanks, playerTank)
 
   local aiController = AIController()
-  for i=1,2 do
+  for i=1,10 do
     local aiTank = Tank(self, aiController)
     table.insert(self.entities, aiTank)
     table.insert(self.tanks, aiTank)
+  end
+
+  table.insert(self.redTeam, self.entities['player'])
+  for i=1,2 do
+    table.insert(self.redTeam, self.tanks[i])
+  end
+
+  for i=#self.redTeam+1, #self.redTeam+3 do
+    table.insert(self.blueTeam, self.tanks[i])
   end
 end
 
@@ -118,15 +128,15 @@ function GameScene:loadMap(mapName)
   maps[mapName]:insert(self)
 end
 
-function GameScene:spawnTanksIfNeeded()
-  for _, tank in ipairs(self.tanks) do
-    if not tank.collider:isActive() and self:getFreeSpawnPoint()~=nil then
+function GameScene:spawnTanksIfNeeded(tanks, spawnpoints)
+  for _, tank in ipairs(tanks) do
+    if not tank.collider:isActive() and self.map:getSpawnpoint(spawnpoints)~=nil then
       local spawnPoint = nil
 
       -- TODO: make fix for when all spawnPoints are busy
       while spawnPoint==nil or spawnPoint:isBusy() do
-        local num = math.random(#self.map.spawnPoints)
-        spawnPoint = self.map.spawnPoints[num]
+        local num = math.random(#spawnpoints)
+        spawnPoint = spawnpoints[num]
         log(((spawnPoint==nil or spawnPoint:isBusy()) and "|" or "O").." "..num)
       end
 
@@ -146,14 +156,4 @@ function GameScene:getBullet()
   local bullet = table.remove(self.bullets, 1)
   table.insert(self.bullets, bullet)
   return bullet
-end
-
-function GameScene:getFreeSpawnPoint()
-  for _, spawnPoint in ipairs(self.map.spawnPoints) do
-    if not spawnPoint:isBusy() then
-      return spawnPoint
-    end
-  end
-
-  return nil
 end

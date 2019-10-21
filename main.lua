@@ -47,12 +47,11 @@ function love.load()
 	input:bind('left', 'dleft')
 	input:bind('right', 'dright')
 
-	gameScene = GameScene('level01')
-	Scene.setScene(gameScene)
-	--scene = gameScene
+	menuScene = MenuScene()
+	gameScene = GameScene()
+	Scene.setScene(menuScene)
 
 	camera = Camera()
-	--camera.scale = 0.25
 end
 
 function love.update(dt)

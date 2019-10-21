@@ -18,6 +18,8 @@ function Map:new(map, sizeX, sizeY)
   -- blocks, spawnPoints [& flags]
   self.blocks = {}
   self.spawnPoints = {}
+  self.redSpawns = {}
+  self.blueSpawns = {}
   self.flags = {}
   for i=1,self.w do
     for j=1,self.h do
@@ -32,6 +34,8 @@ function Map:new(map, sizeX, sizeY)
         local spawnPoint = SpawnPoint(self.level, i-1, j-1)
         spawnPoint:setActive(false)
         table.insert(self.spawnPoints, spawnPoint)
+        if num == 11 then table.insert(self.redSpawns, spawnPoint) end
+        if num == 21 then table.insert(self.blueSpawns, spawnPoint) end
       end
     end
   end
@@ -117,4 +121,14 @@ end
 function Map:isWalkable(x, y)
   local num = self:pointToNum(x, y)
   return num==0
+end
+
+function Map:getSpawnpoint(spawnpoints)
+  for _, spawnPoint in ipairs(spawnpoints) do
+    if not spawnPoint:isBusy() then
+      return spawnPoint
+    end
+  end
+
+  return nil
 end
