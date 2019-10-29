@@ -68,7 +68,11 @@ function AIController:draw(tank)
 
   if self:doSeeCollider(tank, player.collider) then
     love.graphics.setColor(1, 0, 0)
-    love.graphics.ellipse('fill', tank.x, tank.y, tank.h/2, tank.h/2)
+    local h = 0.4
+    local w = 0.05
+    local hh = 0.4
+    love.graphics.ellipse('fill', tank.x, tank.y-h*TILE_SIZE, w*TILE_SIZE, w*TILE_SIZE)
+    love.graphics.rectangle('fill', tank.x-w*TILE_SIZE, tank.y-(h+w*2)*TILE_SIZE, 2*w*TILE_SIZE, -TILE_SIZE*hh)
   end
 end
 

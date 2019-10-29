@@ -1,6 +1,6 @@
 -- lua doesn't have find function for table
 function find(tab, val)
-  for index, value in ipairs(tab) do
+  for index, value in pairs(tab) do
     if value == val then
       return index
     end
