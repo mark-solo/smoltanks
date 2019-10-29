@@ -77,9 +77,9 @@ function GameScene:render()
   if self.map then self.map:draw() end
 
   love.graphics.setLineWidth(5)
-  love.graphics.setColor(1, 0, 0, 0.75)
+  love.graphics.setColor(1, 0, 0)
   for _, tank in ipairs(self.redTeam) do love.graphics.circle("line", tank.x, tank.y, TILE_SIZE/4, 6) end
-  love.graphics.setColor(0, 0, 1, 0.75)
+  love.graphics.setColor(0, 0, 1)
   for _, tank in ipairs(self.blueTeam) do love.graphics.circle("line", tank.x, tank.y, TILE_SIZE/4, 6) end
   love.graphics.setLineWidth(1)
 

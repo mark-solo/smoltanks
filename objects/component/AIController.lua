@@ -3,12 +3,15 @@ AIController = Object:extend()
 local player
 
 function AIController:new()
-  self.targetX = 10
-  self.targetY = 5
+  self.framesToBeStuckInOnePlace = 120
+  --self.targetX = 10
+  --self.targetY = 5
 end
 
 function AIController:init(tank)
   player = tank.level:getEntity('player')
+  tank.beenHereTimer = 0
+  tank.lastCellIndex = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
 
   self:requestPath(tank, player.x, player.y)
 
@@ -39,8 +42,21 @@ function AIController:input(tank)
       --self:moveTo(tank, player.x, player.y)
       self:courseCorrent(tank)
 
-      -- TODO: request new path if stuck in one node for too long
+      if not self:isCloseToTarget(tank, player.x, player.y, TILE_SIZE) then
+        local currentIndex = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
 
+        if currentIndex == tank.lastCellIndex then
+          tank.beenHereTimer = tank.beenHereTimer + 1
+          if tank.beenHereTimer > self.framesToBeStuckInOnePlace then
+            log('im stuck', 'warning')
+            self:requestPath(tank, player.x, player.y)
+            tank.beenHereTimer = 0
+          end
+        else
+          tank.beenHereTimer = 0
+        end
+          tank.lastCellIndex = currentIndex
+      end
     end
   end
 end
