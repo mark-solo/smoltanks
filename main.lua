@@ -70,13 +70,13 @@ function love.update(dt)
 end
 
 function love.draw()
+	--camera:apply()
 	scene:render()
 	--love.graphics.draw(sprites['red'], TILE_SIZE*2, TILE_SIZE*2)
 
-	if (DEBUG) then
+	if DEBUG then
 		world:draw(0.2)
 
-		draw_log(cameraToWorld(0, 0))
 		love.graphics.print("FPS: "..tostring(love.timer.getFPS( )), cameraToWorld(love.graphics.getWidth()-50, 0))
 	end
 end

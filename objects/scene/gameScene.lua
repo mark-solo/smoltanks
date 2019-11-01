@@ -72,7 +72,6 @@ function GameScene:update(dt)
 end
 
 function GameScene:render()
-  --level:draw()
   camera:apply()
   if self.map then self.map:draw() end
 
@@ -87,10 +86,14 @@ function GameScene:render()
     entity:draw()
   end
 
-  if self.map and DEBUG then
-    local cx, cy = worldToPoint(cameraToWorld(love.mouse.getPosition()))
-    love.graphics.setColor(1, 1, 0)
-    love.graphics.print(cx..' '..cy..' '..self.map:pointToNum(cx, cy)..' '..self.map:pointToIndex(cx, cy), cx*TILE_SIZE, cy*TILE_SIZE)
+  if DEBUG then
+    draw_log(cameraToWorld(0, 0))
+    
+    if self.map then
+      local cx, cy = worldToPoint(cameraToWorld(love.mouse.getPosition()))
+      love.graphics.setColor(1, 1, 0)
+      love.graphics.print(cx..' '..cy..' '..self.map:pointToNum(cx, cy)..' '..self.map:pointToIndex(cx, cy), cx*TILE_SIZE, cy*TILE_SIZE)
+    end
   end
 end
 
