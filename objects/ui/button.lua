@@ -3,10 +3,7 @@ Button = Object:extend()
 buttonState = {
   idle = {
     execute = function(button)
-      local mouseX, mouseY = love.mouse.getPosition()
-
-      if mouseX > button.x and mouseX < button.x+button.w and
-         mouseY > button.y and mouseY < button.y+button.h then
+      if button:doesMouseHoverOverMe() then
         button.state = buttonState.hover
       end
     end,
@@ -14,10 +11,7 @@ buttonState = {
   },
   hover = {
     execute = function(button)
-      local mouseX, mouseY = love.mouse.getPosition()
-
-      if mouseX < button.x or mouseX > button.x+button.w or
-         mouseY < button.y or mouseY > button.y+button.h then
+      if not button:doesMouseHoverOverMe() then
         button.state = buttonState.idle
       end
 
@@ -30,10 +24,18 @@ buttonState = {
   press = {
     execute = function(button)
       button.action()
+      button.state = buttonState.idle
     end,
     color = {0.9, 0.9, 0.9}
   }
 }
+
+function Button:doesMouseHoverOverMe()
+  local mouseX, mouseY = love.mouse.getPosition()
+
+  return mouseX > self.x and mouseX < self.x+self.w and
+         mouseY > self.y and mouseY < self.y+self.h
+end
 
 function Button:new(x, y, action, text, w, h)
   self.x = x or 100
