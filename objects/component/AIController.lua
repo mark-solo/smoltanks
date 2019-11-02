@@ -12,8 +12,8 @@ function AIController:init(tank)
   player = tank.level:getEntity('player')
   tank.beenHereTimer = 0
   tank.lastCellIndex = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
-
-  self:requestPath(tank, player.x, player.y)
+  tank.targetMoveTo = nil
+  tank.targetShootAt = nil
 
   if tank.sensors==nil then
     tank.sensors = {}
@@ -28,37 +28,39 @@ function AIController:init(tank)
 end
 
 function AIController:input(tank)
+  -- sense
   for _, sensor in ipairs(tank.sensors) do
     self.checkSensor(tank, sensor)
   end
+  local currentIndex = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
+  if currentIndex == tank.lastCellIndex then
+    tank.beenHereTimer = tank.beenHereTimer + 1
+  else
+    tank.beenHereTimer = 0
+  end
 
-  player = tank.level:getEntity('player')
-
-  if player.collider:isActive() then
-    if not tank.path or tank.path==nil then
-      tank.path = self:requestPath(tank, player.x, player.y)
+  -- act
+  if not tank.targetMoveTo then
+    tank.targetMoveTo = AIController.getTargetMoveTo(tank)
+  else
+    if not tank.path then
+      tank.path = self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
     else
       self:moveAlongPath(tank)
       --self:moveTo(tank, player.x, player.y)
       self:courseCorrent(tank)
 
-      if not self:isCloseToTarget(tank, player.x, player.y, TILE_SIZE) then
-        local currentIndex = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
-
-        if currentIndex == tank.lastCellIndex then
-          tank.beenHereTimer = tank.beenHereTimer + 1
-          if tank.beenHereTimer > self.framesToBeStuckInOnePlace then
-            log('im stuck', 'warning')
-            self:requestPath(tank, player.x, player.y)
-            tank.beenHereTimer = 0
-          end
-        else
+      if not self:isCloseToTarget(tank, tank.targetMoveTo.x, tank.targetMoveTo.y, TILE_SIZE) then
+        if tank.beenHereTimer > self.framesToBeStuckInOnePlace then
+          log('im stuck', 'warning')
+          self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
           tank.beenHereTimer = 0
         end
-          tank.lastCellIndex = currentIndex
       end
     end
   end
+
+  tank.lastCellIndex = currentIndex
 end
 
 function AIController:draw(tank)
@@ -92,6 +94,12 @@ function AIController:draw(tank)
   end
 end
 
+function AIController:death(tank)
+  tank.targetMoveTo = nil
+  tank.path = nil
+  tank.targetShootAt = nil
+end
+
 ---- AI parts
 
 -- sensors
@@ -120,6 +128,17 @@ end
 function AIController:doSee(tank, targetX, targetY)
   local cols = world:queryLine(tank.x, tank.y, targetX, targetY, {'All'})
   return not (#cols > 0)
+end
+
+--
+
+function AIController.getTargetMoveTo(tank)
+  local flagsToChooseFrom = find(tank.level.redTeam, tank) and
+                              tank.level.map.blueFlags or
+                              tank.level.map.redFlags
+
+  local indexOfFlag = math.random(#flagsToChooseFrom)
+  return flagsToChooseFrom[indexOfFlag]
 end
 
 --
@@ -178,7 +197,7 @@ function AIController:moveAlongPath(tank)
       tank.pathIndex = tank.pathIndex + 1
     else
       --log("path ended")
-      self:requestPath(tank, player.x, player.y)
+      self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
     end
   else
     tank:move(1)

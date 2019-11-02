@@ -32,3 +32,7 @@ function PlayerController:input(tank)
     tank:shoot()
   end
 end
+
+function PlayerController:death(tank)
+  log("im dead")
+end

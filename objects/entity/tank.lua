@@ -42,6 +42,7 @@ end
 
 function Tank:death()
   self.collider:setActive(false)
+  self.controller:death(self)
 end
 
 function Tank:turn(da)
