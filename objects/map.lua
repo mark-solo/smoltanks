@@ -21,6 +21,8 @@ function Map:new(map, sizeX, sizeY)
   self.redSpawns = {}
   self.blueSpawns = {}
   self.flags = {}
+  self.redFlags = {}
+  self.blueFlags = {}
   for i=1,self.w do
     for j=1,self.h do
       local num = self:pointToNum(i-1, j-1)
@@ -30,6 +32,12 @@ function Map:new(map, sizeX, sizeY)
         block:setCollisionClass('Wall')
         block:setActive(false)
         table.insert(self.blocks, block)
+      elseif num==10 or num==20 then
+        local flag = Flag(self.level, i-1, j-1)
+        flag:setActive(false)
+        table.insert(self.flags, flag)
+        if num == 10 then table.insert(self.redFlags, flag) end
+        if num == 20 then table.insert(self.blueFlags, flag) end
       elseif num==11 or num==21 then
         local spawnPoint = SpawnPoint(self.level, i-1, j-1)
         spawnPoint:setActive(false)
@@ -51,7 +59,7 @@ function Map:insert(scene)
   for _, wall in ipairs(self.walls) do wall:setActive(true) end
   for _, block in ipairs(self.blocks) do block:setActive(true) end
   for _, spawnPoint in ipairs(self.spawnPoints) do spawnPoint:setActive(true) end
-  for _, flag in ipairs(self.flags) do flag:setActive(true) end
+  for _, flag in ipairs(self.flags) do flag:setActive(true) flag.destroyed = false end
 
   log("map insert")
 
@@ -95,6 +103,10 @@ function Map:draw()
   end
 
   for _, spawnPoint in ipairs(self.spawnPoints) do
+    spawnPoint:draw()
+  end
+
+  for _, spawnPoint in ipairs(self.flags) do
     spawnPoint:draw()
   end
 end

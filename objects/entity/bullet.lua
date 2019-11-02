@@ -42,13 +42,21 @@ function Bullet:update(dt)
     self.collider:setActive(false)
   end
 
-  if self.collider:enter('Wall') or self.collider:exit('Wall') then -- did i hit anything?
+  if self.collider:enter('Wall') or self.collider:exit('Wall') then
     self.collider:setActive(false)
   end
 
-  --if #self.collider:getContacts()>0 then
-  --  self.collider:setActive(false)
-  --end
+  if self.collider:enter('Flag') or self.collider:exit('Flag') then
+    local collision_data = self.collider:getEnterCollisionData('Flag')
+    local flag = collision_data.collider:getObject()
+
+    flag.destroyed = true
+    self.collider:setActive(false)
+  end
+
+  -- if #self.collider:getContacts()>0 then
+  --   self.collider:setActive(false)
+  -- end
 end
 
 function Bullet:draw()
