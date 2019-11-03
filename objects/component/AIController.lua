@@ -4,39 +4,62 @@ local player
 
 function AIController:new()
   self.framesToBeStuckInOnePlace = 120
+  self.aroundSensorRefreshRateInFrames = 10
   --self.targetX = 10
   --self.targetY = 5
 end
 
 function AIController:init(tank)
   player = tank.level:getEntity('player')
-  tank.beenHereTimer = 0
-  tank.lastCellIndex = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
   tank.targetMoveTo = nil
   tank.targetShootAt = nil
 
-  if tank.sensors==nil then
+  tank.beenHereTimer = 0
+  tank.lastCellIndex = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
+
+  tank.aroundSensorRefreshTimer = 0
+  tank.aroundSensorRadius = TILE_SIZE
+  tank.enemiesAroundMe = {}
+
+  -----
+
+  if tank.sensors == nil then
     tank.sensors = {}
     table.insert(tank.sensors, self.makeSensor(-math.pi/4, TILE_SIZE/2,    0.5,  -0.1))
     table.insert(tank.sensors, self.makeSensor( math.pi/4, TILE_SIZE/2,   -0.5,  -0.1))
-    table.insert(tank.sensors, self.makeSensor(-math.pi/8,   TILE_SIZE*0.6,  1.1,  -1.5))
-    table.insert(tank.sensors, self.makeSensor( math.pi/8,   TILE_SIZE*0.6, -1.25,  -1.5))
+    table.insert(tank.sensors, self.makeSensor(-math.pi/8, TILE_SIZE*0.6,  1.1,  -1.5))
+    table.insert(tank.sensors, self.makeSensor( math.pi/8, TILE_SIZE*0.6, -1.25,  -1.5))
     tank.sensors['center'] = nil
     table.insert(tank.sensors, self.makeSensor(         0, TILE_SIZE*0.65,  0.4 , -1.5))
     table.insert(tank.sensors, self.makeSensor(   math.pi, TILE_SIZE/2,  0 , 2))
   end
+
+  --
+
+  tank.myTeam = find(tank.level.blueTeam, tank) == nil and tank.level.redTeam or tank.level.blueTeam
 end
 
 function AIController:input(tank)
   -- sense
+  local currentIndex = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
+  if currentIndex == tank.lastCellIndex then tank.beenHereTimer = tank.beenHereTimer + 1
+  else tank.beenHereTimer = 0 end
+
+  tank.aroundSensorRefreshTimer = tank.aroundSensorRefreshTimer + 1
+  if tank.aroundSensorRefreshTimer > self.aroundSensorRefreshRateInFrames then
+    tank.enemiesAroundMe = {}
+    local colliders = world:queryCircleArea(tank.x, tank.y, tank.aroundSensorRadius, {'Tank'})
+    for _, collider in ipairs(colliders) do
+      if not (collider:getObject() == tank) and find(tank.myTeam, collider:getObject())==nil then
+        table.insert(tank.enemiesAroundMe, collider:getObject())
+      end
+    end
+
+    tank.aroundSensorRefreshTimer = 0
+  end
+
   for _, sensor in ipairs(tank.sensors) do
     self.checkSensor(tank, sensor)
-  end
-  local currentIndex = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
-  if currentIndex == tank.lastCellIndex then
-    tank.beenHereTimer = tank.beenHereTimer + 1
-  else
-    tank.beenHereTimer = 0
   end
 
   -- act
@@ -50,7 +73,7 @@ function AIController:input(tank)
       --self:moveTo(tank, player.x, player.y)
       self:courseCorrent(tank)
 
-      if not self:isCloseToTarget(tank, tank.targetMoveTo.x, tank.targetMoveTo.y, TILE_SIZE) then
+      if not self:isCloseToTarget(tank, tank.targetMoveTo.x, tank.targetMoveTo.y, TILE_SIZE*2) then
         if tank.beenHereTimer > self.framesToBeStuckInOnePlace then
           log('im stuck', 'warning')
           self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
@@ -92,12 +115,16 @@ function AIController:draw(tank)
     love.graphics.ellipse('fill', tank.x, tank.y-h*TILE_SIZE, w*TILE_SIZE, w*TILE_SIZE)
     love.graphics.rectangle('fill', tank.x-w*TILE_SIZE, tank.y-(h+w*2)*TILE_SIZE, 2*w*TILE_SIZE, -TILE_SIZE*hh)
   end
+
+  love.graphics.setColor(1, 1, 1)
+  love.graphics.print(#tank.enemiesAroundMe, tank.x, tank.y-TILE_SIZE)
 end
 
 function AIController:death(tank)
   tank.targetMoveTo = nil
   tank.path = nil
   tank.targetShootAt = nil
+  tank.enemiesAroundMe = {}
 end
 
 ---- AI parts
@@ -133,7 +160,7 @@ end
 --
 
 function AIController.getTargetMoveTo(tank)
-  local flagsToChooseFrom = find(tank.level.redTeam, tank) and
+  local flagsToChooseFrom = tank.myTeam == tank.level.redTeam and
                               tank.level.map.blueFlags or
                               tank.level.map.redFlags
 

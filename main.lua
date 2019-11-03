@@ -27,11 +27,13 @@ function love.load()
   requireFiles(object_files)
 
 	world = wf.newWorld(0, 0, true)
+	if (DEBUG) then world:setQueryDebugDrawing(true) end
   world:addCollisionClass('Tank')
   world:addCollisionClass('Bullet', {ignores = {'Bullet'}})
   world:addCollisionClass('Wall')
   world:addCollisionClass('Spawn', {ignores = {'Spawn'}})
 	world:addCollisionClass('Flag')
+	world:addCollisionClass('Sensor', {ignores = {'Bullet', 'Wall', 'Spawn', 'Flag', 'Sensor'}})
 
   --world = wf.newWorld(0, 0, true)
 	r = ResourceManager()
