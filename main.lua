@@ -33,7 +33,7 @@ function love.load()
   world:addCollisionClass('Wall')
   world:addCollisionClass('Spawn', {ignores = {'Spawn'}})
 	world:addCollisionClass('Flag')
-	world:addCollisionClass('Sensor', {ignores = {'Bullet', 'Wall', 'Spawn', 'Flag', 'Sensor'}})
+	world:addCollisionClass('Sensor', {'All', except={'Spawn'}})
 
   --world = wf.newWorld(0, 0, true)
 	r = ResourceManager()

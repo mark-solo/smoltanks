@@ -4,9 +4,7 @@ local player
 
 function AIController:new()
   self.framesToBeStuckInOnePlace = 120
-  self.aroundSensorRefreshRateInFrames = 10
-  --self.targetX = 10
-  --self.targetY = 5
+  --self.aroundSensorRefreshRateInFrames = 10
 end
 
 function AIController:init(tank)
@@ -17,26 +15,27 @@ function AIController:init(tank)
   tank.beenHereTimer = 0
   tank.lastCellIndex = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
 
-  tank.aroundSensorRefreshTimer = 0
-  tank.aroundSensorRadius = TILE_SIZE
-  tank.enemiesAroundMe = {}
+  --tank.aroundSensorRefreshTimer = 0
+  --tank.aroundSensorRadius = TILE_SIZE
+  --tank.enemiesAroundMe = {}
 
   -----
 
   if tank.sensors == nil then
     tank.sensors = {}
-    table.insert(tank.sensors, self.makeSensor(-math.pi/4, TILE_SIZE/2,    0.5,  -0.1))
-    table.insert(tank.sensors, self.makeSensor( math.pi/4, TILE_SIZE/2,   -0.5,  -0.1))
-    table.insert(tank.sensors, self.makeSensor(-math.pi/8, TILE_SIZE*0.6,  1.1,  -1.5))
+    table.insert(tank.sensors, self.makeSensor(-math.pi/4, TILE_SIZE*0.5,   0.5,  -0.1))
+    table.insert(tank.sensors, self.makeSensor( math.pi/4, TILE_SIZE*0.5,  -0.5,  -0.1))
+    table.insert(tank.sensors, self.makeSensor(-math.pi/8, TILE_SIZE*0.6,   1.1,  -1.5))
     table.insert(tank.sensors, self.makeSensor( math.pi/8, TILE_SIZE*0.6, -1.25,  -1.5))
-    tank.sensors['center'] = nil
-    table.insert(tank.sensors, self.makeSensor(         0, TILE_SIZE*0.65,  0.4 , -1.5))
-    table.insert(tank.sensors, self.makeSensor(   math.pi, TILE_SIZE/2,  0 , 2))
+    table.insert(tank.sensors, self.makeSensor(         0, TILE_SIZE*0.65,  0.4,  -1.5))
+    --table.insert(tank.sensors, self.makeSensor(   math.pi, TILE_SIZE/2,  0 , 2))
   end
 
   --
 
   tank.myTeam = find(tank.level.blueTeam, tank) == nil and tank.level.redTeam or tank.level.blueTeam
+
+  tank.circleSensor = AIController.makeCircleSensor(10, {'Tank'})
 end
 
 function AIController:input(tank)
@@ -45,22 +44,11 @@ function AIController:input(tank)
   if currentIndex == tank.lastCellIndex then tank.beenHereTimer = tank.beenHereTimer + 1
   else tank.beenHereTimer = 0 end
 
-  tank.aroundSensorRefreshTimer = tank.aroundSensorRefreshTimer + 1
-  if tank.aroundSensorRefreshTimer > self.aroundSensorRefreshRateInFrames then
-    tank.enemiesAroundMe = {}
-    local colliders = world:queryCircleArea(tank.x, tank.y, tank.aroundSensorRadius, {'Tank'})
-    for _, collider in ipairs(colliders) do
-      if not (collider:getObject() == tank) and find(tank.myTeam, collider:getObject())==nil then
-        table.insert(tank.enemiesAroundMe, collider:getObject())
-      end
-    end
-
-    tank.aroundSensorRefreshTimer = 0
-  end
-
   for _, sensor in ipairs(tank.sensors) do
     self.checkSensor(tank, sensor)
   end
+
+  tank.circleSensor.update(tank)
 
   -- act
   if not tank.targetMoveTo then
@@ -103,10 +91,6 @@ function AIController:draw(tank)
     end
   end
 
-  for _, sensor in ipairs(tank.sensors) do
-    self.drawSensor(tank, sensor)
-  end
-
   if self:doSeeCollider(tank, player.collider) then
     love.graphics.setColor(1, 0, 0)
     local h = 0.4
@@ -117,7 +101,7 @@ function AIController:draw(tank)
   end
 
   love.graphics.setColor(1, 1, 1)
-  love.graphics.print(#tank.enemiesAroundMe, tank.x, tank.y-TILE_SIZE)
+  love.graphics.print(#tank.circleSensor.result-1, tank.x, tank.y-TILE_SIZE)
 end
 
 function AIController:death(tank)
@@ -189,12 +173,37 @@ function AIController.checkSensor(tank, sensor)
   return sensor.boop
 end
 
-function AIController.drawSensor(tank, sensor)
-  local tx = tank.x + sensor.distance*math.cos(tank.angle+sensor.angle)
-  local ty = tank.y + sensor.distance*math.sin(tank.angle+sensor.angle)
+function AIController.makeBasicSensor(refreshRate, collisionClasses)
+  local sensor = {}
+  sensor.refreshRate = refreshRate or 60
+  sensor.refreshTimer = 0
+  sensor.collisionClasses = collisionClasses or {'All'}
+  sensor.result = {}
 
-  love.graphics.setColor(1, 1, 1, sensor.boop and 1 or 0.5)
-  love.graphics.line(tank.x, tank.y, tx, ty)
+  sensor.update = function(tank)
+    sensor.refreshTimer = sensor.refreshTimer + 1
+    if sensor.refreshTimer > sensor.refreshRate then
+      sensor.check(tank)
+      sensor.refreshTimer = 0
+    end
+  end
+
+  sensor.check = function(tank)
+    sensor.result = {}
+  end
+
+  return sensor
+end
+
+function AIController.makeCircleSensor(refreshRate, collisionClasses, radius)
+  local sensor = AIController.makeBasicSensor(refreshRate, collisionClasses)
+  sensor.radius = radius or TILE_SIZE
+
+  sensor.check = function(tank)
+    sensor.result = world:queryCircleArea(tank.x, tank.y, sensor.radius, sensor.collisionClasses)
+  end
+
+  return sensor
 end
 
 -- actions
