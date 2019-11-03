@@ -1,8 +1,6 @@
 AIController = Object:extend()
 
 function AIController:new()
-  self.framesToBeStuckInOnePlace = 120
-  --self.aroundSensorRefreshRateInFrames = 10
 end
 
 function AIController:init(tank)
@@ -10,16 +8,14 @@ function AIController:init(tank)
   tank.targetMoveTo = nil
   tank.targetShootAt = nil
 
-  tank.beenHereTimer = 0
-  tank.lastCellIndex = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
-
   tank.circleSensor = AIController.makeCircleSensor(10, {'Tank'})
   tank.lineSensors = {}
-  table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(6, {'All'}, -math.pi/4, TILE_SIZE*0.5), correction={ 0.5, -0.1}}) -- this is horrible
-  table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(6, {'All'},  math.pi/4, TILE_SIZE*0.5), correction={-0.5, -0.1}})
-  table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(4, {'All'}, -math.pi/8, TILE_SIZE*0.6), correction={ 1.1, -1.5}})
-  table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(4, {'All'},  math.pi/8, TILE_SIZE*0.5), correction={-1.2, -1.5}})
+  table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(4, {'All'}, -math.pi/4, TILE_SIZE*0.5), correction={ 0.5, -0.1}}) -- this is horrible
+  table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(4, {'All'},  math.pi/4, TILE_SIZE*0.5), correction={-0.5, -0.1}})
+  table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(3, {'All'}, -math.pi/8, TILE_SIZE*0.6), correction={ 1.1, -1.5}})
+  table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(3, {'All'},  math.pi/8, TILE_SIZE*0.5), correction={-1.2, -1.5}})
   table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(2, {'All'},          0, TILE_SIZE*0.6), correction={ 0.4, -1.5}})
+  tank.staySensor = AIController.makeStaySensor(120)
   -----
 
   tank.myTeam = find(tank.level.blueTeam, tank) == nil and tank.level.redTeam or tank.level.blueTeam
@@ -27,14 +23,12 @@ end
 
 function AIController:input(tank)
   -- sense
-  local currentIndex = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
-  if currentIndex == tank.lastCellIndex then tank.beenHereTimer = tank.beenHereTimer + 1
-  else tank.beenHereTimer = 0 end
 
   tank.circleSensor.update(tank)
   for _, sensor in ipairs(tank.lineSensors) do
     sensor.sensor.update(tank)
   end
+  tank.staySensor.update(tank)
 
   -- act
   if not tank.targetMoveTo then
@@ -44,16 +38,9 @@ function AIController:input(tank)
       tank.path = self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
     else
       self:moveAlongPath(tank)
-      --self:moveTo(tank, player.x, player.y)
       self:courseCorrent(tank)
+      self:unstuckIfStuck(tank)
 
-      if not self:isCloseToTarget(tank, tank.targetMoveTo.x, tank.targetMoveTo.y, TILE_SIZE*2) then
-        if tank.beenHereTimer > self.framesToBeStuckInOnePlace then
-          log('im stuck', 'warning')
-          self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
-          tank.beenHereTimer = 0
-        end
-      end
     end
   end
 
@@ -129,27 +116,6 @@ function AIController.getTargetMoveTo(tank)
   return flagsToChooseFrom[indexOfFlag]
 end
 
---
-
-function AIController.makeSensor(angle, distance, turnAngle, moveSpeed)
-  local sensor = {}
-  sensor.angle = angle
-  sensor.distance = distance
-  sensor.turnAngle = turnAngle
-  sensor.moveSpeed = moveSpeed or nil
-  sensor.boop = false
-
-  return sensor
-end
-
-function AIController.checkSensor(tank, sensor)
-  local tx = tank.x + sensor.distance*math.cos(tank.angle+sensor.angle)
-  local ty = tank.y + sensor.distance*math.sin(tank.angle+sensor.angle)
-  local cols = world:queryLine(tank.x, tank.y, tx, ty, {'All', except={'Spawn'}})
-  sensor.boop = #cols>0
-  return sensor.boop
-end
-
 function AIController.makeBasicSensor(refreshRate, collisionClasses)
   local sensor = {}
   sensor.refreshRate = refreshRate or 60
@@ -172,6 +138,19 @@ function AIController.makeBasicSensor(refreshRate, collisionClasses)
   sensor.reset = function()
     sensor.refreshRate = 0
     sensor.result = {}
+  end
+
+  return sensor
+end
+
+function AIController.makeStaySensor(refreshRate)
+  local sensor = AIController.makeBasicSensor(refreshRate)
+  sensor.lastCellIndex = 0
+
+  sensor.check = function(tank)
+    local currentIndex = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
+    sensor.result = currentIndex == sensor.lastCellIndex
+    sensor.lastCellIndex = currentIndex
   end
 
   return sensor
@@ -252,6 +231,23 @@ function AIController:courseCorrent(tank)
       local turnAngle, moveSpeed = sensor.correction[1], sensor.correction[2]
       tank:turn(turnAngle)
       tank:move(moveSpeed)
+    end
+  end
+end
+
+function AIController:unstuckIfStuck(tank)
+  -- if not self:isCloseToTarget(tank, tank.targetMoveTo.x, tank.targetMoveTo.y, TILE_SIZE*2) then
+  --   if tank.beenHereTimer > self.framesToBeStuckInOnePlace then
+  --     log('im stuck', 'warning')
+  --     self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
+  --     tank.beenHereTimer = 0
+  --   end
+  -- end
+
+  if not self:isCloseToTarget(tank, tank.targetMoveTo.x, tank.targetMoveTo.y, TILE_SIZE*2) then
+    if tank.staySensor.result then
+      log('im stuck', 'warning')
+      self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
     end
   end
 end
