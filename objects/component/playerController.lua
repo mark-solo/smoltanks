@@ -33,6 +33,6 @@ function PlayerController:input(tank)
   end
 end
 
-function PlayerController:death(tank)
-  log("im dead")
+function PlayerController:reset(tank)
+  
 end

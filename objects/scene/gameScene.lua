@@ -88,7 +88,7 @@ function GameScene:render()
 
   if DEBUG then
     draw_log(cameraToWorld(0, 0))
-    
+
     if self.map then
       local cx, cy = worldToPoint(cameraToWorld(love.mouse.getPosition()))
       love.graphics.setColor(1, 1, 0)

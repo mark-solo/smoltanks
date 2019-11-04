@@ -4,7 +4,6 @@ function AIController:new()
 end
 
 function AIController:init(tank)
-  player = tank.level:getEntity('player')
   tank.targetMoveTo = nil
   tank.targetShootAt = nil
 
@@ -16,9 +15,19 @@ function AIController:init(tank)
   table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(3, {'All'},  math.pi/8, TILE_SIZE*0.5), correction={-1.2, -1.5}})
   table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(2, {'All'},          0, TILE_SIZE*0.6), correction={ 0.4, -1.5}})
   tank.staySensor = AIController.makeStaySensor(120)
-  -----
+end
 
+function AIController:reset(tank)
   tank.myTeam = find(tank.level.blueTeam, tank) == nil and tank.level.redTeam or tank.level.blueTeam
+  tank.targetMoveTo = nil
+  tank.targetShootAt = nil
+  tank.path = nil
+
+  tank.circleSensor.reset()
+  for _, sensor in ipairs(tank.lineSensors) do
+    sensor.sensor.reset()
+  end
+  tank.staySensor.reset()
 end
 
 function AIController:input(tank)
@@ -66,13 +75,6 @@ function AIController:draw(tank)
 
   love.graphics.setColor(1, 1, 1)
   love.graphics.print(#tank.circleSensor.result-1, tank.x, tank.y-TILE_SIZE)
-end
-
-function AIController:death(tank)
-  tank.targetMoveTo = nil
-  tank.path = nil
-  tank.targetShootAt = nil
-  tank.circleSensor.reset()
 end
 
 ---- AI parts
@@ -136,7 +138,7 @@ function AIController.makeBasicSensor(refreshRate, collisionClasses)
   end
 
   sensor.reset = function()
-    sensor.refreshRate = 0
+    sensor.refreshTimer = 0
     sensor.result = {}
   end
 
@@ -192,13 +194,13 @@ end
 
 function AIController:moveAlongPath(tank)
   local currentPoint = tank.path[tank.pathIndex]
-  if currentPoint==nil then self:requestPath(tank, player.x, player.y) return end
+  if currentPoint==nil then log("path ended", "warning") return end
   local cx, cy = tank.level.map:indexToPoint(currentPoint)
   local cx = (cx+0.5)*TILE_SIZE
   local cy = (cy+0.5)*TILE_SIZE
 
   --tank:setTurretTo(dirToAngle(cx-tank.x, cy-tank.y))
-  tank:setTurretTo(dirToAngle(player.x-tank.x, player.y-tank.y))
+  --tank:setTurretTo(dirToAngle(player.x-tank.x, player.y-tank.y))
   --tank:shoot()
   local dirAngle = dirToAngle(cx-tank.x, cy-tank.y)-tank.angle
   tank:turn(dirAngle)
@@ -245,7 +247,7 @@ function AIController:unstuckIfStuck(tank)
   -- end
 
   if not self:isCloseToTarget(tank, tank.targetMoveTo.x, tank.targetMoveTo.y, TILE_SIZE*2) then
-    if tank.staySensor.result then
+    if tank.staySensor.result and tank.path==nil then
       log('im stuck', 'warning')
       self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
     end
