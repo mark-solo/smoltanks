@@ -1,0 +1,20 @@
+{
+  "WASD": {
+    "forward":    "w",
+       "back":    "s",
+       "left":    "a",
+      "right":    "d"
+  },
+  "IJKL": {
+    "forward":    "i",
+       "back":    "k",
+       "left":    "j",
+      "right":    "l"
+  },
+  "Arrows": {
+    "forward":    "up",
+       "back":  "down",
+       "left":  "left",
+      "right": "right"
+  }
+}

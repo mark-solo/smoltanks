@@ -34,9 +34,9 @@ function GameScene:init(dt)
 
   if self.gameParameters.playerOnTeam == 'red' then
     table.insert(self.redTeam, self.entities['player'])
-  else if self.gameParameters.playerOnTeam == 'blue' then
+  elseif self.gameParameters.playerOnTeam == 'blue' then
     table.insert(self.blueTeam, self.entities['player'])
-  end end
+  end
 
   local c = 1
   for i=#self.redTeam, #self.map.redSpawns-1 do

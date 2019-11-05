@@ -6,11 +6,11 @@ function ResourceManager:new()
   sprites = {}
   self:loadSprites()
 
-  --levels = {}
   maps = {}
   self:loadLevels()
 
-  -- level state = {}
+  inputConfigs = {}
+  self:loadControls()
 end
 
 local function stripFileToName(string)
@@ -71,4 +71,37 @@ function ResourceManager:loadLevels()
     --levels[name] = Level(map, sizeX, sizeY)
     maps[name] = Map(map, sizeX, sizeY)
   end
+end
+
+function ResourceManager:loadControls()
+  local filePath = 'resources/controlsPresets.json'
+  local contents, size = love.filesystem.read(filePath)
+
+  if contents == nil then
+    local defaultInput = Input()
+    defaultInput:bind('up', 'forward')
+  	defaultInput:bind('down', 'back')
+  	defaultInput:bind('left', 'left')
+  	defaultInput:bind('right', 'right')
+  	defaultInput:bind('w', 'dup')
+  	defaultInput:bind('s', 'ddown')
+
+    input = defaultInput
+  else
+    local json = json.decode(contents)
+    for name, preset in pairs(json) do
+      local newInput = Input()
+      for action, button in pairs(preset) do
+        newInput:bind(button, action)
+      end
+
+      --inputConfigs[name] = newInput
+      --inputConfigs[#inputConfigs] = newInput
+      table.insert(inputConfigs, {name=name, preset=newInput})
+    end
+
+    input = inputConfigs[#inputConfigs]
+  end
+
+
 end

@@ -15,7 +15,7 @@ buttonState = {
         button.state = buttonState.idle
       end
 
-      if love.mouse.isDown(1) then
+      if mousePressed and not wasPressed then
         button.state = buttonState.press
       end
     end,
@@ -24,7 +24,7 @@ buttonState = {
   press = {
     execute = function(button)
       button.action()
-      button.state = buttonState.idle
+      button.state = buttonState.hover
     end,
     color = {0.9, 0.9, 0.9}
   }

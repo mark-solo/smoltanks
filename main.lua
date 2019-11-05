@@ -3,6 +3,7 @@ Object = require "lib.classic"
 Input = require "lib.input"
 wf = require "lib.windfield"
 inspect = require "lib.inspect"
+json = require "lib.json"
 
 -- constants
 DEBUG = true
@@ -15,7 +16,8 @@ local fixedUpdateTimer = 0
 local log_text = {}
 local last_logline_repeated = 0
 
-timer = 0
+mousePressed = false
+wasPressed = false
 
 function love.load()
 	--love.window.setMode(640, 480)
@@ -38,18 +40,6 @@ function love.load()
   --world = wf.newWorld(0, 0, true)
 	r = ResourceManager()
 
-	input = Input() -- TODO: move controls to options
-	input:bind('w', 'forward')
-	input:bind('s', 'back')
-	input:bind('a', 'left')
-	input:bind('d', 'right')
-	input:bind('space', 'space')
-	input:bind('mouse1', 'click')
-	input:bind('up', 'dup')
-	input:bind('down', 'ddown')
-	input:bind('left', 'dleft')
-	input:bind('right', 'dright')
-
 	menuScene = MenuScene()
 	gameScene = GameScene()
 	Scene.setScene(menuScene)
@@ -58,6 +48,8 @@ function love.load()
 end
 
 function love.update(dt)
+	mousePressed = love.mouse.isDown(1)
+
 	scene:input()
 	scene:update(dt)
 	world:update(dt)
@@ -69,7 +61,7 @@ function love.update(dt)
 		fixedUpdateTimer = 0
 	end
 
-	timer = timer + dt
+	wasPressed = mousePressed
 end
 
 function love.draw()
@@ -80,6 +72,7 @@ function love.draw()
 	if DEBUG then
 		world:draw(0.2)
 
+		love.graphics.setColor(1, 1, 1)
 		love.graphics.print("FPS: "..tostring(love.timer.getFPS( )), cameraToWorld(love.graphics.getWidth()-50, 0))
 	end
 end

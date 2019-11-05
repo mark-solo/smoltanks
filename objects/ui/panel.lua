@@ -2,11 +2,19 @@ Panel = Object:extend()
 
 function Panel:new(active)
   self.active = active or false
-  self.buttons = buttons or {}
+  self.elements = {}
 end
 
-function Panel:addButton(button)
-  table.insert(self.buttons, button)
+function Panel:addElement(element, pos)
+  if pos == nil then
+    table.insert(self.elements, element)
+  else
+    self.elements[pos] = element
+  end
+end
+
+function Panel:getElement(elementName)
+  return self.elements[elementName]
 end
 
 function Panel:setActive(value)
@@ -15,16 +23,18 @@ end
 
 function Panel:update()
   if self.active then
-    for _, button in pairs(self.buttons) do
-      button:update()
+    for _, element in pairs(self.elements) do
+      if element.update then
+        element:update()
+      end
     end
   end
 end
 
 function Panel:draw()
   if self.active then
-    for _, button in pairs(self.buttons) do
-      button:draw()
+    for _, element in pairs(self.elements) do
+      element:draw()
     end
   end
 end
