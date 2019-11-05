@@ -7,12 +7,12 @@ function AIController:init(tank)
   tank.targetMoveTo = nil
   tank.targetShootAt = nil
 
-  tank.circleSensor = AIController.makeCircleSensor(10, {'Tank'})
+  tank.circleSensor = AIController.makeCircleSensor(10, {'Tank'}, TILE_SIZE*2)
   tank.lineSensors = {}
   table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(4, {'All'}, -math.pi/4, TILE_SIZE*0.5), correction={ 0.5, -0.1}}) -- this is horrible
   table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(4, {'All'},  math.pi/4, TILE_SIZE*0.5), correction={-0.5, -0.1}})
   table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(3, {'All'}, -math.pi/8, TILE_SIZE*0.6), correction={ 1.1, -1.5}})
-  table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(3, {'All'},  math.pi/8, TILE_SIZE*0.5), correction={-1.2, -1.5}})
+  table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(3, {'All'},  math.pi/8, TILE_SIZE*0.6), correction={-1.2, -1.5}})
   table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(2, {'All'},          0, TILE_SIZE*0.6), correction={ 0.4, -1.5}})
   tank.staySensor = AIController.makeStaySensor(120)
 end
@@ -43,13 +43,13 @@ function AIController:input(tank)
   if not tank.targetMoveTo then
     tank.targetMoveTo = AIController.getTargetMoveTo(tank)
   else
+
     if not tank.path then
       tank.path = self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
     else
-      self:moveAlongPath(tank)
       self:courseCorrent(tank)
       self:unstuckIfStuck(tank)
-
+      self:moveAlongPath(tank)
     end
   end
 
@@ -155,6 +155,11 @@ function AIController.makeStaySensor(refreshRate)
     sensor.lastCellIndex = currentIndex
   end
 
+  sensor.reset = function()
+    sensor.refreshTimer = sensor.refreshRate
+    sensor.result = false
+  end
+
   return sensor
 end
 
@@ -194,7 +199,12 @@ end
 
 function AIController:moveAlongPath(tank)
   local currentPoint = tank.path[tank.pathIndex]
-  if currentPoint==nil then log("path ended", "warning") return end
+  if currentPoint==nil then
+    log("path ended", "warning")
+    tank.targetMoveTo = nil
+    return
+  end
+
   local cx, cy = tank.level.map:indexToPoint(currentPoint)
   local cx = (cx+0.5)*TILE_SIZE
   local cy = (cy+0.5)*TILE_SIZE
@@ -205,12 +215,14 @@ function AIController:moveAlongPath(tank)
   local dirAngle = dirToAngle(cx-tank.x, cy-tank.y)-tank.angle
   tank:turn(dirAngle)
 
-  if self:isCloseToTarget(tank, cx, cy, TILE_SIZE) then
+  if self:isCloseToTarget(tank, cx, cy, TILE_SIZE/2) then
     if tank.pathIndex+1 <= #tank.path then
       tank.pathIndex = tank.pathIndex + 1
     else
-      --log("path ended")
-      self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
+      log("path ended", "warning")
+      tank.targetMoveTo = nil
+      return
+      --self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
     end
   else
     tank:move(1)
@@ -247,7 +259,8 @@ function AIController:unstuckIfStuck(tank)
   -- end
 
   if not self:isCloseToTarget(tank, tank.targetMoveTo.x, tank.targetMoveTo.y, TILE_SIZE*2) then
-    if tank.staySensor.result and tank.path==nil then
+    --if tank.staySensor.result and not tank.path==nil then
+    if tank.staySensor.result then
       log('im stuck', 'warning')
       self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
     end

@@ -22,6 +22,9 @@ end
 
 function Pathfinding.getPath(requester, map, start, goal)
   --local start = Pathfinding.inspectAndFixPoint(map, start, goal)
+  local index = find(Pathfinding.order, requester)
+  if index ~= nil then return end
+
   local goal = Pathfinding.inspectAndFixPoint(map, goal, start)
 
   local request_params = {}
@@ -30,7 +33,7 @@ function Pathfinding.getPath(requester, map, start, goal)
   request_params.goal = goal
 
   Pathfinding.queue[requester] = request_params
-  local index = find(Pathfinding.order, requester)
+
   if index~=nil then table.remove(Pathfinding.order, index) end
   table.insert(Pathfinding.order, requester)
 end

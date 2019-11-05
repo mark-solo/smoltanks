@@ -8,21 +8,52 @@ function GameScene:new()
   self.redTeam = {}
   self.blueTeam = {}
 
+  self:initEntities()
+
   log('entities: '..inspect(self.entities, {depth=1}))
+  self.gameParameters = {
+    map = 'level01',
+    playerOnTeam = 'blue'
+  }
+end
+
+--------------------
+
+function GameScene:newGame(gameParameters)
+  Scene.setScene(gameScene)
+  self.gameParameters = gameParameters
+  self.state = self.init
 end
 
 --------------------
 
 function GameScene:init(dt)
-  self:initEntities()
+  self:loadMap(self.gameParameters.map)
+  self.redTeam = {}
+  self.blueTeam = {}
 
-  return self.reset
+  if self.gameParameters.playerOnTeam == 'red' then
+    table.insert(self.redTeam, self.entities['player'])
+  else if self.gameParameters.playerOnTeam == 'blue' then
+    table.insert(self.blueTeam, self.entities['player'])
+  end end
+
+  local c = 1
+  for i=#self.redTeam, #self.map.redSpawns-1 do
+    table.insert(self.redTeam, self.tanks[c])
+    c = c + 1
+  end
+
+  for i=#self.blueTeam, #self.map.blueSpawns-1 do
+    table.insert(self.blueTeam, self.tanks[c])
+    c = c + 1
+  end
+
+  return self.game
 end
 
 function GameScene:reset(dt)
-  self:loadMap('level01')
-
-  return self.game
+  return self.test
 end
 
 function GameScene:game(dt)
@@ -38,7 +69,7 @@ function GameScene:game(dt)
   camera:setPos(self:getEntity('player').x, self:getEntity('player').y)
 end
 
-function GameScene:final(dt)
+function GameScene:winOrLose(dt)
 
 end
 
@@ -118,20 +149,13 @@ function GameScene:initEntities()
   --table.insert(self.tanks, playerTank)
 
   local aiController = AIController()
-  for i=1,10 do
+  for i=1,20 do
     local aiTank = Tank(self, aiController)
     table.insert(self.entities, aiTank)
     table.insert(self.tanks, aiTank)
   end
 
-  table.insert(self.redTeam, self.entities['player'])
-  for i=1,2 do
-    table.insert(self.redTeam, self.tanks[i])
-  end
 
-  for i=#self.redTeam+1, #self.redTeam+3 do
-    table.insert(self.blueTeam, self.tanks[i])
-  end
 end
 
 function GameScene:loadMap(mapName)

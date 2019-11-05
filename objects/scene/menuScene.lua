@@ -4,7 +4,7 @@ function MenuScene:new()
   self.ui = {}
   self.ui.main_panel = Panel(true)
   self.ui.main_panel:addButton(Button(100, 100,
-                                      function() Scene.setScene(gameScene) end,
+                                      function() gameScene:newGame(self.gameParameters) end,
                                       "play"))
   self.ui.main_panel:addButton(Button(100, 120,
                                       function()
@@ -20,10 +20,15 @@ function MenuScene:new()
                                         self.ui.options_panel:setActive(false)
                                       end,
                                       "back"))
+
+  self.gameParameters = {
+    map = 'level01',
+    playerOnTeam = 'blue'
+  }
 end
 
 function MenuScene:input()
-  if input:pressed('space') then Scene.setScene(gameScene) end
+  --if input:pressed('space') then gameScene:newGame(self.gameParameters) end
 end
 
 function MenuScene:update(dt)
