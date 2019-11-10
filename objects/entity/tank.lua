@@ -2,6 +2,7 @@ Tank = Entity:extend()
 
 function Tank:new(level, controller, type)
   Tank.super.new(self, level, 0, 0, 0, TILE_SIZE*0.55, TILE_SIZE*0.3)
+  --Tank.super.new(self, level, 0, 0, 0, TILE_SIZE*0.7, TILE_SIZE*0.4)
   self.level = level
   self.controller = controller
   self.controller:init(self)
@@ -9,6 +10,7 @@ function Tank:new(level, controller, type)
   --self.id = math.random(1000)
 
   local d = 4
+  --local d = 6
   self.da = 0
   --self.turnSpeed = 5000*TILE_SIZE
   self.turnSpeed = d*1000*TILE_SIZE

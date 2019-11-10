@@ -1,10 +1,11 @@
 SpawnPoint = Entity:extend()
 
-function SpawnPoint:new(level, px, py)
+function SpawnPoint:new(map, px, py, color)
   local x = px*TILE_SIZE
   local y = py*TILE_SIZE
+  self.color = 'red' or color
 
-  SpawnPoint.super.new(self, level, x, y, 0, TILE_SIZE, TILE_SIZE)
+  SpawnPoint.super.new(self, map.level, x, y, 0, TILE_SIZE, TILE_SIZE)
 
   self.entitiyCount = 0
 
@@ -12,6 +13,11 @@ function SpawnPoint:new(level, px, py)
   self.collider:setType('static')
   self.collider:setCollisionClass('Spawn')
   self.collider:setSensor(true)
+
+  local sw, sh = sprites['tiles']:getDimensions()
+  local offset = color == 'red' and 0 or 1
+  local quad = love.graphics.newQuad((2+offset)*sh, 0, sh, sh, sw, sh)
+  map.background:add(quad, x, y)
 
   self.tank = nil -- tank to spawn
 end
@@ -34,12 +40,8 @@ end
 function SpawnPoint:draw()
   if self:isBusy() then
     love.graphics.setColor(0.5, 0.5, 0.5)
-  else
-    love.graphics.setColor(1, 0, 1)
+    local d = 0.25*TILE_SIZE
+    love.graphics.rectangle('fill', self.x+d, self.y+d, self.w-2*d, self.h-2*d)
   end
-  local d = 0.2*TILE_SIZE
-  love.graphics.rectangle('fill', self.x+d, self.y+d, self.w-2*d, self.h-2*d)
 
-  love.graphics.setColor(1, 1, 1)
-  love.graphics.print(self.entitiyCount, self.x+self.w/2, self.y+self.h/2)
 end

@@ -49,7 +49,7 @@ function MenuScene:new()
 
   self.gameParameters = {
     map = 'level01',
-    playerOnTeam = 'blue'
+    playerOnTeam = 'red'
   }
 end
 

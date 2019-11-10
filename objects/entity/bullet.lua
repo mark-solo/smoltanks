@@ -50,7 +50,7 @@ function Bullet:update(dt)
     local collision_data = self.collider:getEnterCollisionData('Flag')
     local flag = collision_data.collider:getObject()
 
-    flag.destroyed = true
+    flag:destroy()
     self.collider:setActive(false)
   end
 

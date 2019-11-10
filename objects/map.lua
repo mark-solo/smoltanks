@@ -1,10 +1,26 @@
 Map = Object:extend()
 
-function Map:new(map, sizeX, sizeY)
+function Map:new(map, sizeX, sizeY, texture)
   self.map = map
-  self.w = sizeX or 20
-  self.h = sizeY or 10
-  --self.background -- cached image
+  self.w = sizeX
+  self.h = sizeY
+
+  local sw, sh = sprites['tiles']:getDimensions()
+  local airQuad = love.graphics.newQuad(0, 0, sh, sh, sw, sh)
+  local wallQuad = love.graphics.newQuad(sh, 0, sh, sh, sw, sh)
+  self.background = love.graphics.newSpriteBatch(sprites['tiles'])
+  for i=1, self.w do
+    for j=1, self.h do
+      local num = self:pointToNum(i-1, j-1)
+      local x, y = (i-1)*TILE_SIZE, (j-1)*TILE_SIZE
+      --local sx, sy = n/TILE_SIZE, n/TILE_SIZE;
+      if num == 0 then
+        self.background:add(airQuad, x, y)
+      elseif num == 1 then
+        self.background:add(wallQuad, x, y)
+      end
+    end
+  end
 
   -- walls
   self.walls = {}
@@ -14,6 +30,14 @@ function Map:new(map, sizeX, sizeY)
   table.insert(self.walls, world:newRectangleCollider(self.w*TILE_SIZE, 0, TILE_SIZE, self.h*TILE_SIZE))
   --box = world:newRectangleCollider(love.graphics.getWidth()/2-50, love.graphics.getHeight()/2-30, 100, 60)
   for _, wall in ipairs(self.walls) do wall:setType('static') wall:setCollisionClass('Wall') wall:setActive(false) end
+  for i=1, self.w+1 do
+    self.background:add(wallQuad, -TILE_SIZE, (i-2)*TILE_SIZE)
+    self.background:add(wallQuad, self.w*TILE_SIZE, (i-1)*TILE_SIZE)
+  end
+  for i=1, self.h+1 do
+    self.background:add(wallQuad, (i-1)*TILE_SIZE, -TILE_SIZE)
+    self.background:add(wallQuad, (i-2)*TILE_SIZE, self.h*TILE_SIZE)
+  end
 
   -- blocks, spawnPoints [& flags]
   self.blocks = {}
@@ -33,13 +57,13 @@ function Map:new(map, sizeX, sizeY)
         block:setActive(false)
         table.insert(self.blocks, block)
       elseif num==10 or num==20 then
-        local flag = Flag(self.level, i-1, j-1)
+        local flag = Flag(self, i-1, j-1, num==10 and 'red' or 'blue')
         flag:setActive(false)
         table.insert(self.flags, flag)
         if num == 10 then table.insert(self.redFlags, flag) end
         if num == 20 then table.insert(self.blueFlags, flag) end
       elseif num==11 or num==21 then
-        local spawnPoint = SpawnPoint(self.level, i-1, j-1)
+        local spawnPoint = SpawnPoint(self, i-1, j-1, num==11 and 'red' or 'blue')
         spawnPoint:setActive(false)
         table.insert(self.spawnPoints, spawnPoint)
         if num == 11 then table.insert(self.redSpawns, spawnPoint) end
@@ -59,7 +83,7 @@ function Map:insert(scene)
   for _, wall in ipairs(self.walls) do wall:setActive(true) end
   for _, block in ipairs(self.blocks) do block:setActive(true) end
   for _, spawnPoint in ipairs(self.spawnPoints) do spawnPoint:setActive(true) end
-  for _, flag in ipairs(self.flags) do flag:setActive(true) flag.destroyed = false end
+  for _, flag in ipairs(self.flags) do  flag:reset() end
 
   log("map insert")
 
@@ -101,6 +125,9 @@ function Map:draw()
       love.graphics.print((j-1)*self.w+(i-1), (i-1)*TILE_SIZE, (j-1)*TILE_SIZE)
     end
   end
+
+  love.graphics.setColor(1, 1, 1)
+  love.graphics.draw(self.background)
 
   for _, spawnPoint in ipairs(self.spawnPoints) do
     spawnPoint:draw()

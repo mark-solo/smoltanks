@@ -1,15 +1,23 @@
 Flag = Entity:extend()
 
-function Flag:new(level, px, py)
+function Flag:new(map, px, py, color)
   local x = px * TILE_SIZE
   local y = py * TILE_SIZE
+  self.map = map
+  self.color = 'red' or color
 
-  Flag.super.new(self, level, x, y, 0, TILE_SIZE, TILE_SIZE)
+  Flag.super.new(self, map.level, x, y, 0, TILE_SIZE, TILE_SIZE)
 
   self.collider = world:newRectangleCollider(px*TILE_SIZE, py*TILE_SIZE, TILE_SIZE, TILE_SIZE)
   self.collider:setType('static')
   self.collider:setCollisionClass('Flag')
   self.collider:setObject(self)
+
+  local sw, sh = sprites['tiles']:getDimensions()
+  local offset = color == 'red' and 0 or 1
+  self.ok_quad = love.graphics.newQuad((4+offset)*sh, 0, sh, sh, sw, sh)
+  self.broked_quad = love.graphics.newQuad((6+offset)*sh, 0, sh, sh, sw, sh)
+  self.quad_id = self.map.background:add(self.ok_quad, x, y)
 
   self.destroyed = false
 end
@@ -18,12 +26,13 @@ function Flag:setActive(value)
   self.collider:setActive(value)
 end
 
-function Flag:draw(args)
-  if self.destroyed then
-    love.graphics.setColor(1, 0.2, 0.2)
-  else
-    love.graphics.setColor(0.5, 0.5, 0.5)
-  end
-  local d = 0.2*TILE_SIZE
-  love.graphics.rectangle('fill', self.x+d, self.y+d, self.w-2*d, self.h-2*d)
+function Flag:reset()
+  self:setActive(true);
+  self.destroyed = false;
+  self.map.background:set(self.quad_id, self.ok_quad, self.x, self.y)
+end
+
+function Flag:destroy()
+  self.destroyed = true;
+  self.map.background:set(self.quad_id, self.broked_quad, self.x, self.y)
 end
