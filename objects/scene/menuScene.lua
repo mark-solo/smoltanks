@@ -1,56 +1,75 @@
 MenuScene = Scene:extend()
 
 function MenuScene:new()
+  self.gameParameters = {
+    map = 1,
+    playerOnTeam = 'red'
+  }
+
+  --------------------
+
   self.ui = {}
   -----
   self.ui.main_panel = Panel(true)
-  self.ui.main_panel:addElement(Button(100, 100,
+  self.ui.main_panel:addElement(Button(TILE_SIZE/2, 5*TILE_SIZE,
                                       function() gameScene:newGame(self.gameParameters) end,
-                                      "play"))
-  self.ui.main_panel:addElement(Button(100, 120,
+                                      "PLAY"))
+  self.ui.main_panel:addElement(Button(TILE_SIZE/2, 5.5*TILE_SIZE,
                                       function()
-                                        self.ui.main_panel:setActive(false)
-                                        self.ui.controls_panel:setActive(true)
+                                        self.ui.controls_panel:toggle()
                                       end,
-                                      "settings"))
+                                      "SETTINGS"))
+  self.ui.main_panel:addElement(Button(TILE_SIZE/2, 6*TILE_SIZE,
+                                      function()
+                                        love.window.close()
+                                      end,
+                                      "EXIT"))
+
+  self.ui.main_panel:addElement(Label(5.5*TILE_SIZE, 4.25*TILE_SIZE,
+                                      maps[self.gameParameters.map].name,
+                                      TILE_SIZE, 0.35*TILE_SIZE),
+                                      'mapsLabel')
+  self.ui.main_panel:addElement(Button(5*TILE_SIZE, 4.25*TILE_SIZE,
+                                      function()
+                                        self.gameParameters.map = (self.gameParameters.map-1-1) % #maps + 1
+                                        print(self.ui.main_panel:getElement('mapsLabel').text)
+                                        local name = maps[self.gameParameters.map].name
+                                        self.ui.main_panel:getElement('mapsLabel').text = name
+                                      end,
+                                      "<",
+                                      TILE_SIZE/2))
+  self.ui.main_panel:addElement(Button(6.5*TILE_SIZE, 4.25*TILE_SIZE,
+                                      function()
+                                        self.gameParameters.map = (self.gameParameters.map-1+1) % #maps + 1
+                                        local name = maps[self.gameParameters.map].name
+                                        self.ui.main_panel:getElement('mapsLabel').text = name
+                                      end,
+                                      ">",
+                                      TILE_SIZE/2))
   -----
   self.ui.controls_panel = Panel()
-
-  self.ui.controls_panel:addElement(Button(300, 100,
+  self.ui.controls_panel:addElement(Label(3*TILE_SIZE, 5*TILE_SIZE,
+                                          input.name,
+                                          1.5*TILE_SIZE, TILE_SIZE*0.85),
+                                          'controlsLabel')
+  self.ui.controls_panel:addElement(Button(3*TILE_SIZE, 6*TILE_SIZE,
                                           function()
                                             local index = find(inputConfigs, input)
-                                            index = (index-2) % #inputConfigs + 1
+                                            index = (index-1-1) % #inputConfigs + 1
                                             input = inputConfigs[index]
                                             self.ui.controls_panel:getElement('controlsLabel').text = input.name
                                           end,
                                           "<",
-                                          20, 20))
-  self.ui.controls_panel:addElement(Label(330, 100,
-                                          input.name,
-                                          50, 20), 'controlsLabel')
-  self.ui.controls_panel:addElement(Button(390, 100,
+                                          TILE_SIZE/2))
+  self.ui.controls_panel:addElement(Button(4*TILE_SIZE, 6*TILE_SIZE,
                                           function()
                                             local index = find(inputConfigs, input)
-                                            index = index % #inputConfigs + 1
+                                            index = (index-1+1) % #inputConfigs + 1
                                             input = inputConfigs[index]
                                             self.ui.controls_panel:getElement('controlsLabel').text = input.name
                                           end,
                                           ">",
-                                          20, 20))
-  self.ui.controls_panel:addElement(Button(330, 130,
-                                          function()
-                                            self.ui.main_panel:setActive(true)
-                                            self.ui.controls_panel:setActive(false)
-                                          end,
-                                          "back",
-                                          50, 20))
-
-  --------------------
-
-  self.gameParameters = {
-    map = 'level01',
-    playerOnTeam = 'red'
-  }
+                                          TILE_SIZE/2))
 end
 
 function MenuScene:input()
@@ -64,6 +83,9 @@ function MenuScene:update(dt)
 end
 
 function MenuScene:render()
+  local map = maps[self.gameParameters.map].map:drawPreview(5*TILE_SIZE, 2*TILE_SIZE,
+                                          2*TILE_SIZE, 2*TILE_SIZE)
+
   if DEBUG then
     draw_log(0, 0)
   end

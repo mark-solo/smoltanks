@@ -40,8 +40,8 @@ end
 function Button:new(x, y, action, text, w, h)
   self.x = x or 100
   self.y = y or 100
-  self.w = w or 100
-  self.h = h or 20
+  self.w = w or TILE_SIZE*2
+  self.h = h or TILE_SIZE*0.35
   self.text = text or "meow"
   self.action = action
   self.state = buttonState.idle

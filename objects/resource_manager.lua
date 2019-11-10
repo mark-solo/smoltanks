@@ -69,7 +69,7 @@ function ResourceManager:loadLevels()
     end
 
     --levels[name] = Level(map, sizeX, sizeY)
-    maps[name] = Map(map, sizeX, sizeY)
+    table.insert(maps, {name = name, map=Map(map, sizeX, sizeY)})
   end
 end
 
@@ -102,6 +102,4 @@ function ResourceManager:loadControls()
 
     input = inputConfigs[#inputConfigs]
   end
-
-
 end

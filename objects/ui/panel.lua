@@ -21,6 +21,10 @@ function Panel:setActive(value)
   self.active = value
 end
 
+function Panel:toggle()
+  self.active = not self.active
+end
+
 function Panel:update()
   if self.active then
     for _, element in pairs(self.elements) do

@@ -30,13 +30,14 @@ function Map:new(map, sizeX, sizeY, texture)
   table.insert(self.walls, world:newRectangleCollider(self.w*TILE_SIZE, 0, TILE_SIZE, self.h*TILE_SIZE))
   --box = world:newRectangleCollider(love.graphics.getWidth()/2-50, love.graphics.getHeight()/2-30, 100, 60)
   for _, wall in ipairs(self.walls) do wall:setType('static') wall:setCollisionClass('Wall') wall:setActive(false) end
+  self.wallsLayer = love.graphics.newSpriteBatch(sprites['tiles'])
   for i=1, self.w+1 do
-    self.background:add(wallQuad, -TILE_SIZE, (i-2)*TILE_SIZE)
-    self.background:add(wallQuad, self.w*TILE_SIZE, (i-1)*TILE_SIZE)
+    self.wallsLayer:add(wallQuad, -TILE_SIZE, (i-2)*TILE_SIZE)
+    self.wallsLayer:add(wallQuad, self.w*TILE_SIZE, (i-1)*TILE_SIZE)
   end
   for i=1, self.h+1 do
-    self.background:add(wallQuad, (i-1)*TILE_SIZE, -TILE_SIZE)
-    self.background:add(wallQuad, (i-2)*TILE_SIZE, self.h*TILE_SIZE)
+    self.wallsLayer:add(wallQuad, (i-1)*TILE_SIZE, -TILE_SIZE)
+    self.wallsLayer:add(wallQuad, (i-2)*TILE_SIZE, self.h*TILE_SIZE)
   end
 
   -- blocks, spawnPoints [& flags]
@@ -106,36 +107,21 @@ function Map:update(dt)
 end
 
 function Map:draw()
-  local colorsToDraw = {}
-  colorsToDraw[0] = {0, 0, 0} -- air
-  colorsToDraw[1] = {1, 1, 1} -- wall
-  colorsToDraw[10] = {1, 0, 0} -- red flag
-  colorsToDraw[20] = {0, 0, 1} -- blue flag
-  colorsToDraw[11] = {1, 1, 0} -- red spawn
-  colorsToDraw[21] = {0, 1, 1} -- blue spawn
-
-  for i=1,self.w do
-    for j=1,self.h do
-      local num = self:pointToNum(i-1, j-1)
-      --if num==1 then love.graphics.setColor(1, 0, 0, 1)
-      --else love.graphics.setColor(1, 1, 1, 0.5) end
-      local color = colorsToDraw[num]
-      love.graphics.setColor(color[1], color[2], color[3])
-      love.graphics.rectangle('line', (i-1)*TILE_SIZE, (j-1)*TILE_SIZE, TILE_SIZE, TILE_SIZE)
-      love.graphics.print((j-1)*self.w+(i-1), (i-1)*TILE_SIZE, (j-1)*TILE_SIZE)
-    end
-  end
-
   love.graphics.setColor(1, 1, 1)
   love.graphics.draw(self.background)
-
-  for _, spawnPoint in ipairs(self.spawnPoints) do
-    spawnPoint:draw()
-  end
+  love.graphics.draw(self.wallsLayer)
 
   for _, spawnPoint in ipairs(self.flags) do
     spawnPoint:draw()
   end
+end
+
+function Map:drawPreview(x, y, w, h)
+  love.graphics.setColor(1, 1, 1)
+  local realw, realh = self.w*TILE_SIZE, self.h*TILE_SIZE
+  local sw, sh = w/realw, h/realh
+
+  love.graphics.draw(self.background, x, y, 0, sw, sh)
 end
 
 --
