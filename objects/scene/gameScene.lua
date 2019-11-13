@@ -37,11 +37,13 @@ function GameScene:init(dt)
   local c = 1
   for i=#self.redTeam, #self.map.redSpawns-1 do
     table.insert(self.redTeam, self.tanks[c])
+    self.tanks[c].controller:init(self.tanks[c])
     c = c + 1
   end
 
   for i=#self.blueTeam, #self.map.blueSpawns-1 do
     table.insert(self.blueTeam, self.tanks[c])
+    self.tanks[c].controller:init(self.tanks[c])
     c = c + 1
   end
 
@@ -49,6 +51,14 @@ function GameScene:init(dt)
 end
 
 function GameScene:reset(dt)
+  for _, tank in ipairs(self.redTeam) do
+    tank.controller:reset(tank)
+  end
+
+  for _, tank in ipairs(self.blueTeam) do
+    tank.controller:reset(tank)
+  end
+
   return self.test
 end
 

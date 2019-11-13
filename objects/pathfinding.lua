@@ -4,7 +4,6 @@ Pathfinding.queue = {}
 Pathfinding.order = {}
 
 function Pathfinding.update(dt)
-  --log('queue '..inspect(Pathfinding.order, {depth=1}))
   local tank = table.remove(Pathfinding.order, 1)
   if tank~=nil then
     local r_params = Pathfinding.queue[tank]
@@ -20,10 +19,12 @@ function Pathfinding.update(dt)
   end
 end
 
+--function Pathfinding.update(dt) end
+
 function Pathfinding.getPath(requester, map, start, goal)
-  --local start = Pathfinding.inspectAndFixPoint(map, start, goal)
   local index = find(Pathfinding.order, requester)
-  if index ~= nil then return end
+  --if index ~= nil then return end
+  --if index ~= nil and index < #Pathfinding.order-1 then table.remove(Pathfinding.order, index) end
 
   local goal = Pathfinding.inspectAndFixPoint(map, goal, start)
 
@@ -37,6 +38,14 @@ function Pathfinding.getPath(requester, map, start, goal)
   if index~=nil then table.remove(Pathfinding.order, index) end
   table.insert(Pathfinding.order, requester)
 end
+
+function Pathfinding.getPath1(requester, map, start, goal)
+  local goal = Pathfinding.inspectAndFixPoint(map, goal, start)
+  local path =  Pathfinding.aStar(map, start, goal)
+  --path = Pathfinding.optimizePath(map, path)
+  requester.path = path
+end
+
 
 --
 

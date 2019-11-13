@@ -25,24 +25,21 @@ function MenuScene:new()
                                       end,
                                       "EXIT"))
 
-  self.ui.main_panel:addElement(Label(5.5*TILE_SIZE, 4.25*TILE_SIZE,
+  self.ui.main_panel:addElement(Label(5.1*TILE_SIZE, 4.25*TILE_SIZE,
                                       maps[self.gameParameters.map].name,
-                                      TILE_SIZE, 0.35*TILE_SIZE),
+                                      1.3*TILE_SIZE, 0.35*TILE_SIZE),
                                       'mapsLabel')
-  self.ui.main_panel:addElement(Button(5*TILE_SIZE, 4.25*TILE_SIZE,
+  self.ui.main_panel:addElement(Button(4.5*TILE_SIZE, 4.25*TILE_SIZE,
                                       function()
                                         self.gameParameters.map = (self.gameParameters.map-1-1) % #maps + 1
-                                        print(self.ui.main_panel:getElement('mapsLabel').text)
-                                        local name = maps[self.gameParameters.map].name
-                                        self.ui.main_panel:getElement('mapsLabel').text = name
+                                        self.ui.main_panel:getElement('mapsLabel').text = maps[self.gameParameters.map].name
                                       end,
                                       "<",
                                       TILE_SIZE/2))
   self.ui.main_panel:addElement(Button(6.5*TILE_SIZE, 4.25*TILE_SIZE,
                                       function()
                                         self.gameParameters.map = (self.gameParameters.map-1+1) % #maps + 1
-                                        local name = maps[self.gameParameters.map].name
-                                        self.ui.main_panel:getElement('mapsLabel').text = name
+                                        self.ui.main_panel:getElement('mapsLabel').text = maps[self.gameParameters.map].name
                                       end,
                                       ">",
                                       TILE_SIZE/2))
@@ -83,8 +80,8 @@ function MenuScene:update(dt)
 end
 
 function MenuScene:render()
-  local map = maps[self.gameParameters.map].map:drawPreview(5*TILE_SIZE, 2*TILE_SIZE,
-                                          2*TILE_SIZE, 2*TILE_SIZE)
+  local map = maps[self.gameParameters.map].map:drawPreview(4.5*TILE_SIZE, 1.5*TILE_SIZE,
+                                          2.5*TILE_SIZE, 2.5*TILE_SIZE)
 
   if DEBUG then
     draw_log(0, 0)

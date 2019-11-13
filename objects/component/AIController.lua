@@ -15,10 +15,11 @@ function AIController:init(tank)
   table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(3, {'All'},  math.pi/8, TILE_SIZE*0.6), correction={-1.2, -1.5}})
   table.insert(tank.lineSensors, {sensor=AIController.makeLineSensor(2, {'All'},          0, TILE_SIZE*0.6), correction={ 0.4, -1.5}})
   tank.staySensor = AIController.makeStaySensor(120)
+
+  tank.myTeam = find(tank.level.blueTeam, tank) == nil and tank.level.redTeam or tank.level.blueTeam
 end
 
 function AIController:reset(tank)
-  tank.myTeam = find(tank.level.blueTeam, tank) == nil and tank.level.redTeam or tank.level.blueTeam
   tank.targetMoveTo = nil
   tank.targetShootAt = nil
   tank.path = nil
@@ -40,16 +41,23 @@ function AIController:input(tank)
   tank.staySensor.update(tank)
 
   -- act
-  if not tank.targetMoveTo then
+  if tank.targetMoveTo == nil then
     tank.targetMoveTo = AIController.getTargetMoveTo(tank)
   else
 
-    if not tank.path then
+    if not tank.path or tank.path == nil then
       tank.path = self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
     else
       self:courseCorrent(tank)
       self:unstuckIfStuck(tank)
       self:moveAlongPath(tank)
+
+      if tank.targetMoveTo == nil or self:isCloseToTarget(tank, tank.targetMoveTo.x, tank.targetMoveTo.x, TILE_SIZE) then
+        tank.targetMoveTo = AIController.getTargetMoveTo(tank)
+        if tank.targetMoveTo ~= nil then
+          tank.path = self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
+        end
+      end
     end
   end
 
@@ -107,16 +115,91 @@ function AIController:doSee(tank, targetX, targetY)
   return not (#cols > 0)
 end
 
---
+----------
 
 function AIController.getTargetMoveTo(tank)
+  local target = AIController.getEnemyFlag(tank)
+  if target ~= nil then return target end
+
+  target = AIController.getEnemy(tank)
+  if target ~= nil then return target end
+
+  local target = AIController.getFriendlyFlag(tank)
+  if target ~= nil then return target end
+
+  target = AIController.getRandomPoint(tank)
+  return target
+end
+
+function AIController.getTargetShootAt1(tank)
+  local target = AIController.seeFlag(tank)
+  if target ~= nil then return target end
+
+  target = AIController.seeEnemy(tank)
+  return target
+end
+
+-----
+
+function AIController.getEnemyFlag(tank)
   local flagsToChooseFrom = tank.myTeam == tank.level.redTeam and
                               tank.level.map.blueFlags or
                               tank.level.map.redFlags
 
+  if #flagsToChooseFrom == 0 then return nil end
+
   local indexOfFlag = math.random(#flagsToChooseFrom)
   return flagsToChooseFrom[indexOfFlag]
 end
+
+function AIController.getEnemy(tank)
+  if tank.sensor == nil then return nil end
+
+  local aroundMe = tank.sensor.circleSensor.result
+  local enemiesAroundMe = {}
+
+  for _, collider in ipairs(aroundMe) do
+    if find(tank.myTeam, collider:getObject()) ~= -1 then
+      table.insert(enemiesAroundMe, collider:getObject())
+    end
+  end
+
+  local indexOfEnemy = math.random(#enemiesAroundMe)
+  return enemiesAroundMe[indexOfEnemy]
+end
+
+function AIController.getFriendlyFlag(tank)
+  local flagsToChooseFrom = tank.myTeam == tank.level.redTeam and
+                              tank.level.map.redFlags or
+                              tank.level.map.blueFlags
+
+  if #flagsToChooseFrom == 0 then return nil end
+
+  local indexOfFlag = math.random(#flagsToChooseFrom)
+  local aBitOf = {}
+  aBitOf.x = flagsToChooseFrom[indexOfFlag].x + math.random(-3, 3)*TILE_SIZE
+  aBitOf.y = flagsToChooseFrom[indexOfFlag].y + math.random(-3, 3)*TILE_SIZE
+
+  return aBitOf
+end
+
+function AIController.getRandomPoint(tank)
+  local aBitOf = {}
+  aBitOf.x = tank.x + math.random(-3, 3)*TILE_SIZE
+  aBitOf.y = tank.y + math.random(-3, 3)*TILE_SIZE
+
+  return aBitOf
+end
+
+function AIController.seeFlag(tank)
+
+end
+
+function AIController.seeEnemy(tank)
+  -- body...
+end
+
+----------
 
 function AIController.makeBasicSensor(refreshRate, collisionClasses)
   local sensor = {}
@@ -147,7 +230,7 @@ end
 
 function AIController.makeStaySensor(refreshRate)
   local sensor = AIController.makeBasicSensor(refreshRate)
-  sensor.lastCellIndex = 0
+  sensor.lastCellIndex = nil
 
   sensor.check = function(tank)
     local currentIndex = tank.level.map:pointToIndex(worldToPoint(tank.x, tank.y))
@@ -156,8 +239,9 @@ function AIController.makeStaySensor(refreshRate)
   end
 
   sensor.reset = function()
-    sensor.refreshTimer = sensor.refreshRate
+    sensor.refreshTimer = 0
     sensor.result = false
+    sensor.lastCellIndex = nil
   end
 
   return sensor
@@ -258,11 +342,11 @@ function AIController:unstuckIfStuck(tank)
   --   end
   -- end
 
-  if not self:isCloseToTarget(tank, tank.targetMoveTo.x, tank.targetMoveTo.y, TILE_SIZE*2) then
+  --if not self:isCloseToTarget(tank, tank.targetMoveTo.x, tank.targetMoveTo.y, TILE_SIZE*2) then
     --if tank.staySensor.result and not tank.path==nil then
     if tank.staySensor.result then
       log('im stuck', 'warning')
       self:requestPath(tank, tank.targetMoveTo.x, tank.targetMoveTo.y)
     end
-  end
+  --end
 end
