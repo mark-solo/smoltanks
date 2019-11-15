@@ -13,14 +13,34 @@ function love.load()
 	local object_files = {}
   recursiveEnumerate('objects', object_files)
   requireFiles(object_files)
+
+	input = Input()
+	input:bind(   'up',    'up')
+	input:bind( 'left',  'left')
+	input:bind('right', 'right')
+	input:bind( 'down',  'down')
+
+	menu = MenuScene()
+		main = MainScene()
+		mode = ModeScene()
+		settings = SettingsScene()
+		exit = ExitScene()
+	game = GameScene()
+		play = PlayScene()
+		reset = ResetScene()
+		pause = PauseScene()
+		final = FinalScene()
+
+	Scene.setScene(menu)
 end
 
 function love.update(dt)
+	scene:input()
+	scene:update(dt)
 end
 
 function love.draw()
-	love.graphics.setColor(1, 1, 1)
-	love.graphics.rectangle('fill', TILE_SIZE, TILE_SIZE, TILE_SIZE, TILE_SIZE)
+	scene:draw()
 end
 
 ----------
